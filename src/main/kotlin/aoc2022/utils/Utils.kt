@@ -4,18 +4,12 @@ import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
 
-/**
- * Reads lines from the given input txt file.
- */
 fun readInput() = readFile("input.txt")
 fun readTestInput() = readFile("test_input.txt")
 
 private fun readFile(fileName: String) = File("src/main/resources", fileName)
     .readLines()
 
-/**
- * Converts string to aoc2022.utils.md5 hash.
- */
 fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray()))
     .toString(16)
     .padStart(32, '0')
@@ -29,26 +23,22 @@ fun <L, T> ((L) -> T).appliedTo(
 }
 
 
-typealias Matrix<E> = List<List<E>>
 typealias Point2D<E> = Pair<E, E>
-typealias DiscretePoint = Point2D<Int>
+typealias Point = Point2D<Int>
 
-fun Matrix<Int>.prettyPrint() {
+typealias Matrix<E> = List<List<E>>
+
+fun <E> Matrix<E>.prettyPrint() {
     println(joinToString("\n"))
 }
 
-fun matrixOf(input: List<String>) = input.map {
+fun matrixOf(input: List<String>): Matrix<Int> = input.map {
     it.split("").filter(String::isNotBlank).map(String::toInt).toList()
 }
 
 
-fun <T> T.shouldNotBe(equalTo: T): T {
-    check(this != equalTo) { "Shouldn't be $equalTo" }
-    return this
-}
-
 fun <E> Matrix<E>.transposed(): Matrix<E> {
-    checkSquare()
+    forEach { check(it.size == this[0].size) { "Non-square matrix passed to transpose" } }
     val copy = mutableListOf<List<E>>()
     for (i: Int in 0..this.lastIndex) {
         val list = mutableListOf<E>()
@@ -61,11 +51,6 @@ fun <E> Matrix<E>.transposed(): Matrix<E> {
     return copy.toList()
 }
 
-private fun <E> Matrix<E>.checkSquare() {
-    forEach { check(it.size == this[0].size) { "Non-square matrix passed to transpose" } }
-}
-
-
 operator fun <E> Matrix<E>.get(
     rowIndex: Int,
     colIndex: Int
@@ -76,10 +61,16 @@ operator fun <E> Matrix<E>.get(
     return Triple(row, column, tree)
 }
 
-fun List<Int>.beforeAndAfter(index: Int): Pair<List<Int>, List<Int>> {
-    return subList(0, index) to subList(index + 1, size)
-}
 
 fun <E> Matrix<E>.column(i: Int): List<E> {
     return map { it[i] }.toList()
+}
+
+fun <T> T.shouldNotBe(equalTo: T): T {
+    check(this != equalTo) { "Shouldn't be $equalTo" }
+    return this
+}
+
+fun List<Int>.beforeAndAfter(index: Int): Pair<List<Int>, List<Int>> {
+    return subList(0, index) to subList(index + 1, size)
 }

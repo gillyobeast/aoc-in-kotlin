@@ -85,7 +85,7 @@ fun main() {
 
     // part 1
 //    ::aoc2022.part1.appliedTo(testInput, returns = 21)
-    println("Part 1: ${aoc2022.part1(input).shouldNotBe(equalTo = 1071)}")
+    println("Part 1: ${part1(input).shouldNotBe(equalTo = 1071)}")
 
 
     // part 2
