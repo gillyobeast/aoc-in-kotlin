@@ -23,6 +23,7 @@ private fun countVisible(matrix: Matrix<Int>): Int {
 }
 
 
+
 private fun <E> Matrix<E>.iterate(block: (Int, Int) -> Unit) {
     indices.forEach { rowIndex ->
         this[rowIndex].indices.forEach { colIndex ->

@@ -37,3 +37,8 @@ operator fun <E> Matrix<E>.get(
 fun <E> Matrix<E>.column(i: Int): List<E> {
     return map { it[i] }.toList()
 }
+
+
+fun List<Int>.beforeAndAfter(index: Int): Pair<List<Int>, List<Int>> {
+    return subList(0, index) to subList(index + 1, size)
+}

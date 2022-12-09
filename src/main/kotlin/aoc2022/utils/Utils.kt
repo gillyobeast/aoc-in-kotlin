@@ -22,16 +22,11 @@ fun <L, T> ((L) -> T).appliedTo(
     check(output == returns) { "expected $returns but was $output" }
 }
 
-
-typealias Point2D<E> = Pair<E, E>
-typealias Point = Point2D<Int>
-
-
 fun <T> T.shouldNotBe(equalTo: T): T {
     check(this != equalTo) { "Shouldn't be $equalTo" }
     return this
 }
 
-fun List<Int>.beforeAndAfter(index: Int): Pair<List<Int>, List<Int>> {
-    return subList(0, index) to subList(index + 1, size)
-}
+typealias Point2D<E> = Pair<E, E>
+typealias Point = Point2D<Int>
+
