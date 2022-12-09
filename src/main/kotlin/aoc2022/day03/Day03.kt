@@ -2,6 +2,7 @@ package aoc2022.day03
 
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
+import aoc2022.utils.readTestInput
 
 private fun <E> List<E>.toTriple(): Triple<E, E, E> {
     assert(this.size == 3)
@@ -64,7 +65,7 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput()
+    val testInput = readTestInput()
     val input = readInput()
 
     // part 1

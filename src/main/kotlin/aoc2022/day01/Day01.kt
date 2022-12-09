@@ -2,6 +2,7 @@ package aoc2022.day01
 
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
+import aoc2022.utils.readTestInput
 
 fun main() {
     fun caloriesPerElf(input: List<String>): MutableList<Int> {
@@ -33,7 +34,7 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput()
+    val testInput = readTestInput()
     ::maxTotalCalories.appliedTo(testInput, returns = 24000)
     ::totalCaloriesForTop3Elves.appliedTo(testInput, returns = 45000)
 

@@ -3,6 +3,7 @@ package aoc2022.day09
 import aoc2022.utils.DiscretePoint
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
+import aoc2022.utils.readTestInput
 import kotlin.math.abs
 import kotlin.math.sign
 
@@ -105,7 +106,7 @@ private fun <T> T.log(s: String = ""): T = this//.also { print(s + it) }
 
 fun main() {
 
-    val testInput = readInput()
+    val testInput = readTestInput()
     val input = readInput()
 
     // part 1

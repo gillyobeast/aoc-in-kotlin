@@ -2,6 +2,7 @@ package aoc2022
 
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
+import aoc2022.utils.readTestInput
 
 fun part1(input: List<String>): Int {
     return input.size
@@ -13,7 +14,7 @@ fun part2(input: List<String>): Int {
 
 fun main() {
 
-    val testInput = readInput()
+    val testInput = readTestInput()
     val input = readInput()
 
     // part 1

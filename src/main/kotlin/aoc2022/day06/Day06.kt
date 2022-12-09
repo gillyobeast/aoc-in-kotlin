@@ -19,7 +19,7 @@ fun main() {
     }
 
 // test if implementation meets criteria from the description, like:
-//    val testInput = aoc2022.utils.readInput("input_test")
+//    val testInput = aoc2022.utils.readTestInput()
     val input = readInput()
 
 // part 1

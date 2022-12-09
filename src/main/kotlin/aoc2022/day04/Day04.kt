@@ -2,6 +2,7 @@ package aoc2022.day04
 
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
+import aoc2022.utils.readTestInput
 
 fun main() {
 
@@ -46,7 +47,7 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput()
+    val testInput = readTestInput()
     val input = readInput()
 
     // part 1

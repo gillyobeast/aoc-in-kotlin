@@ -80,7 +80,7 @@ fun Int.viewDistanceTo(trees: List<Int>): Int {
 fun main() {
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput()
+    val testInput = readTestInput()
     val input = readInput()
 
     // part 1
