@@ -35,9 +35,6 @@ private fun <E> Matrix<E>.iterate(block: (Int, Int) -> Unit) {
 
 private fun List<Int>.blocks(tree: Int) = any { it >= tree }
 
-private fun matrixOf(input: List<String>) = input.map {
-    it.split("").filter(String::isNotBlank).map(String::toInt).toList()
-}
 
 
 fun part2(input: List<String>): Int {

@@ -1,11 +1,12 @@
 package aoc2022.day09
 
+import aoc2022.utils.DiscretePoint
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
 import kotlin.math.abs
 import kotlin.math.sign
 
-enum class Move(val regex: Regex, val applyTo: (Point) -> Point) {
+enum class Move(val regex: Regex, val applyTo: (DiscretePoint) -> DiscretePoint) {
     UP("U \\d+".toRegex(), { it.first to it.second + 1 }),
     DOWN("D \\d+".toRegex(), { it.first to it.second - 1 }),
     LEFT("L \\d+".toRegex(), { it.first - 1 to it.second }),
@@ -19,8 +20,6 @@ enum class Move(val regex: Regex, val applyTo: (Point) -> Point) {
         }
     }
 }
-
-typealias Point = Pair<Int, Int>
 
 fun part1(input: List<String>): Int {
 
@@ -57,7 +56,7 @@ fun part2(input: List<String>): Int {
 //    println(moves)
 
 // head, 1, 2, 3, 4, 5, 6, 7, 8, 9
-    val knots = mutableListOf<Point>()
+    val knots = mutableListOf<DiscretePoint>()
 
     repeat(10) { knots.add(0 to 0) }
     val tailVisitedPositions = mutableSetOf(knots[9])
@@ -84,7 +83,7 @@ fun part2(input: List<String>): Int {
     return tailVisitedPositions.size
 }
 
-private fun Point.moveToward(other: Point): Point {
+private fun DiscretePoint.moveToward(other: DiscretePoint): DiscretePoint {
     this.log("start ")
     other.log(", towards ")
     return if (this.isWithin1Of(other)) this
@@ -96,7 +95,7 @@ private fun Point.moveToward(other: Point): Point {
 private fun Int.moveToward(first1: Int) = this + (first1 - this).sign
 
 
-private fun Point.isWithin1Of(headPosition: Point): Boolean {
+private fun DiscretePoint.isWithin1Of(headPosition: DiscretePoint): Boolean {
     return abs(first - headPosition.first).log(", x ") <= 1 && abs(second - headPosition.second).log(
         ", y "
     ) <= 1

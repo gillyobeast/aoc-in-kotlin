@@ -27,10 +27,17 @@ fun <L, T> ((L) -> T).appliedTo(
 
 
 typealias Matrix<E> = List<List<E>>
+typealias Point2D<E> = Pair<E, E>
+typealias DiscretePoint = Point2D<Int>
 
 fun Matrix<Int>.prettyPrint() {
     println(joinToString("\n"))
 }
+
+fun matrixOf(input: List<String>) = input.map {
+    it.split("").filter(String::isNotBlank).map(String::toInt).toList()
+}
+
 
 fun <T> T.shouldNotBe(equalTo: T): T {
     check(this != equalTo) { "Shouldn't be $equalTo" }
