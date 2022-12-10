@@ -33,8 +33,27 @@ object Day10 : Puzzle(2022, 10) {
         return signalStrengths.sum()
     }
 
-    override fun part2(input: List<String>): Int {
-        return input.size
+    override fun part2(input: List<String>): String {
+
+        var x = 1
+        var clock = 0 // also the centre of Sprite
+
+        val crtBuffer = StringBuilder()
+
+        input.forEach { instruction ->
+            if (instruction == "noop") {
+                clock++
+                // do stuff
+            } else {
+                repeat(2) { _ ->
+                    clock++
+                    // do stuff
+                }
+                x += instruction.substringAfter(" ").toInt()
+            }
+        }
+
+        return ""
     }
 
     fun solve() {
@@ -47,7 +66,16 @@ object Day10 : Puzzle(2022, 10) {
         println("Part 1: ${part1(input)}")
 
         // part 2
-        Day10::part2.appliedTo(testInput, returns = -1)
+        Day10::part2.appliedTo(
+            testInput, returns = """
+            ##..##..##..##..##..##..##..##..##..##..
+            ###...###...###...###...###...###...###.
+            ####....####....####....####....####....
+            #####.....#####.....#####.....#####.....
+            ######......######......######......####
+            #######.......#######.......#######.....            
+            """.trimIndent()
+        )
         println("Part 2: ${part2(input)}")
     }
 }
