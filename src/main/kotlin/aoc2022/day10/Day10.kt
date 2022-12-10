@@ -1,28 +1,31 @@
 package aoc2022.day10
 
+import aoc2022.Puzzle
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
 import aoc2022.utils.readTestInput
 
-fun part1(input: List<String>): Int {
-    return input.size
+object Day10 : Puzzle(2022, 10) {
+    override fun part1(input: List<String>): Int {
+        return input.size
+    }
+
+    fun main() {
+
+        val testInput = readTestInput()
+        val input = readInput()
+
+        // part 1
+        Day10::part1.appliedTo(testInput, returns = 13140)
+        println("Part 1: ${part1(input)}")
+
+        // part 2
+        Day10::part2.appliedTo(testInput, returns = -1)
+        println("Part 2: ${part2(input)}")
+    }
+    override fun part2(input: List<String>): Int {
+        return input.size
+    }
 }
 
-fun part2(input: List<String>): Int {
-    return input.size
-}
-
-fun main() {
-
-    val testInput = readTestInput()
-    val input = readInput()
-
-    // part 1
-    ::part1.appliedTo(testInput, returns = -1)
-    println("Part 1: ${part1(input)}")
-
-    // part 2
-    ::part2.appliedTo(testInput, returns = -1)
-    println("Part 2: ${part2(input)}")
-}
 
