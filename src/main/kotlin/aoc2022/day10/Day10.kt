@@ -33,28 +33,34 @@ object Day10 : Puzzle(2022, 10) {
         return signalStrengths.sum()
     }
 
+    private fun StringBuilder.draw(clock: Int, x: Int) {
+        if ((clock % 40) - x in 0..2) append("[]") else append("  ")
+        if (clock % 40 == 0) append("|\n")
+    }
+
     override fun part2(input: List<String>): String {
 
         var x = 1
-        var clock = 0 // also the centre of Sprite
+        var clock = 0 // clock % 40 == centre of Sprite
 
         val crtBuffer = StringBuilder()
 
         input.forEach { instruction ->
             if (instruction == "noop") {
                 clock++
-                // do stuff
+                crtBuffer.draw(clock, x)
             } else {
                 repeat(2) { _ ->
                     clock++
-                    // do stuff
+                    crtBuffer.draw(clock, x)
                 }
                 x += instruction.substringAfter(" ").toInt()
             }
         }
 
-        return ""
+        return crtBuffer.toString()
     }
+
 
     fun solve() {
 
@@ -66,17 +72,29 @@ object Day10 : Puzzle(2022, 10) {
         println("Part 1: ${part1(input)}")
 
         // part 2
-        Day10::part2.appliedTo(
-            testInput, returns = """
-            ##..##..##..##..##..##..##..##..##..##..
-            ###...###...###...###...###...###...###.
-            ####....####....####....####....####....
-            #####.....#####.....#####.....#####.....
-            ######......######......######......####
-            #######.......#######.......#######.....            
-            """.trimIndent()
-        )
-        println("Part 2: ${part2(input)}")
+        val output = part2(testInput)
+        check(
+            output.trim() == """
+[][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    |
+[][][]      [][][]      [][][]      [][][]      [][][]      [][][]      [][][]  |
+[][][][]        [][][][]        [][][][]        [][][][]        [][][][]        |
+[][][][][]          [][][][][]          [][][][][]          [][][][][]          |
+[][][][][][]            [][][][][][]            [][][][][][]            [][][]  |
+[][][][][][][]              [][][][][][][]              [][][][][][][]          |
+                    """.trimIndent().trim()
+        ) {
+            "expected \n${
+                """
+[][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    |
+[][][]      [][][]      [][][]      [][][]      [][][]      [][][]      [][][]  |
+[][][][]        [][][][]        [][][][]        [][][][]        [][][][]        |
+[][][][][]          [][][][][]          [][][][][]          [][][][][]          |
+[][][][][][]            [][][][][][]            [][][][][][]            [][][]  |
+[][][][][][][]              [][][][][][][]              [][][][][][][]          | 
+                        """.trimIndent().trim()
+            } but was \n$output" }
+        println("Part 2: \n${part2(input)}")
+        // ZKJFBJFZ
     }
 }
 
