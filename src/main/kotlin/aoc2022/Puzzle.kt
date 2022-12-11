@@ -3,8 +3,9 @@ package aoc2022
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
 import aoc2022.utils.readTestInput
+import kotlin.system.measureTimeMillis
 
-abstract class Puzzle(val year: Int, val day:Int){
+abstract class Puzzle(val year: Int, val day: Int) {
     abstract fun part1(input: List<String>): Any
     abstract fun part2(input: List<String>): Any
     open fun <T> solve(part1TestResult: T, part2TestResult: T) {
@@ -13,15 +14,19 @@ abstract class Puzzle(val year: Int, val day:Int){
 
         // part 1
         ::part1.appliedTo(testInput, returns = part1TestResult)
-        println("Part 1: ${part1(input)}")
+        printTimeMillis {
+            println("Part 1: ${part1(input)}")
+        }
 
         // part 2
         ::part2.appliedTo(testInput, returns = part2TestResult)
-        println("Part 2: ${part2(input)}")
+        printTimeMillis {
+            println("Part 2: ${part2(input)}")
+        }
 
     }
 }
 
-fun main(){
-    
+private fun printTimeMillis(block: () -> Unit) {
+    measureTimeMillis(block).apply { println("Took ${this}ms") }
 }

@@ -1,7 +1,6 @@
 package aoc2022.day11
 
 import aoc2022.Puzzle
-import kotlin.system.measureTimeMillis
 
 object Day11 : Puzzle(2022, 11) {
     data class Monkey(
@@ -99,7 +98,5 @@ private fun List<Long>.product(): Long {
 }
 
 fun main() {
-    measureTimeMillis {
-        Day11.solve(10_605L, 2_713_310_158L)
-    }.also { println("Took ${it}ms") }
+    Day11.solve(10_605L, 2_713_310_158L)
 }
