@@ -10,13 +10,19 @@ data class Monkey(
         private set
 
     fun evaluateAndThrowItemsTo(monkeys: List<Monkey>) {
+//        num.andLog(": ")
+//        items.andLog("; ")
         while (items.isNotEmpty()) {
+            val inflatedWorry = operation(items.removeFirst())
+//                .andLog(", ")
+            val newWorry = inflatedWorry / 3
             val target =
-                if (operation(items[0]) % testDivisibleBy == 0) ifTrueTarget
+                if (newWorry % testDivisibleBy == 0) ifTrueTarget
                 else ifFalseTarget
-            throwTo(monkeys[target], items.removeFirst() / 3)
+            throwTo(monkeys[target/*.andLog(" gets ")*/], newWorry/*.andLog("; ")*/)
             activity++
         }
+//        "activity = $activity".andLog("\n")
     }
 
     private fun throwTo(other: Monkey, item: Int) {
@@ -64,7 +70,13 @@ fun String.parseOperation(): (Int) -> Int {
 }
 
 private fun String.parseItems(): ArrayDeque<Int> =
-    ArrayDeque(extract("Starting items: ((\\d+,?)\\s?)+".toRegex()).split(",").map(String::toInt))
+    ArrayDeque(
+        substringAfter("Starting items: ")
+            .substringBefore("Operation:")
+            .split(",")
+            .map(String::trim)
+            .map(String::toInt)
+    )
 
 
 private fun String.extractInt(regex: Regex): Int {
@@ -78,16 +90,21 @@ object Day11 : Puzzle(2022, 11) {
     override fun part1(input: List<String>): Any {
         val monkeys = input.joinToString("")
             .split("Monkey".toRegex()).drop(1)
-            .map { it.andLog() }
-            .map { it.trim().toMonkey().andLog() }
-            .sortedBy { it.activity };
+//            .map { it.andLog() }
+            .map { it.trim().toMonkey() }
 
-        repeat(20) { monkeys.onEach { it.evaluateAndThrowItemsTo(monkeys) } }
+        repeat(20) {round ->
+//            (round + 1 ).andLog(":")
+            monkeys.onEach { it.evaluateAndThrowItemsTo(monkeys) }
+//            monkeys.onEach { "\t${it.num} has ${it.items}".andLog("\n\t") }
+//            "\n".andLog()
+        }
 
         return monkeys
-            .takeLast(2).andLog() // should be the highest activity
+            .sortedBy { it.activity }
+            .takeLast(2)/*.andLog()*/ // should be the highest activity
             .fold(1) { product, monkey -> product * monkey.activity }
-            .andLog()
+//            .andLog("\n")
 
     }
 
@@ -96,7 +113,7 @@ object Day11 : Puzzle(2022, 11) {
     }
 }
 
-private fun <T> T.andLog(): T = this.also { println(it) }
+private fun <T> T.andLog(suffix: String = ""): T = this.also { print(it.toString() + suffix) }
 
 
 fun main() {

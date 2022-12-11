@@ -1,6 +1,5 @@
 package aoc2022
 
-import aoc2022.day10.Day10
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
 import aoc2022.utils.readTestInput
@@ -14,11 +13,11 @@ abstract class Puzzle(val year: Int, val day:Int){
 
         // part 1
         ::part1.appliedTo(testInput, returns = part1TestResult)
-        println("Part 1: ${Day10.part1(input)}")
+        println("Part 1: ${part1(input)}")
 
-        // part 1
-        ::part1.appliedTo(testInput, returns = part2TestResult)
-        println("Part 1: ${Day10.part1(input)}")
+        // part 2
+        ::part2.appliedTo(testInput, returns = part2TestResult)
+        println("Part 2: ${part2(input)}")
 
     }
 }
