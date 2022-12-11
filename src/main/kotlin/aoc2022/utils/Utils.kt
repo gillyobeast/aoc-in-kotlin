@@ -16,12 +16,14 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
     .toString(16)
     .padStart(32, '0')
 
-fun <L, T> ((L) -> T).appliedTo(
-    input: L,
-    returns: T
-) {
-    val output = this(input)
-    check(output == returns) { "expected $returns but was $output" }
+infix fun <L, T> ((L) -> T).appliedTo(
+    input: L
+): T {
+    return this(input)
+}
+
+infix fun <T> T.returns(result: T) {
+    check(this == result) { "expected $result but was $this" }
 }
 
 fun <T> T.shouldNotBe(equalTo: T): T {
