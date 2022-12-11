@@ -2,10 +2,11 @@ package aoc2022.day06
 
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
+import aoc2022.utils.returns
 
-fun main() {
+object Day06 {
 
-    fun String.findIndexOfUniqueSubstring(ofLength: Int): Int {
+    private fun String.findIndexOfUniqueSubstring(ofLength: Int): Int {
         return windowedSequence(ofLength) { it.toSet().size == ofLength }
             .indexOfFirst { it /* == true */ } + ofLength
     }
@@ -18,24 +19,26 @@ fun main() {
         return input.findIndexOfUniqueSubstring(ofLength = 14)
     }
 
-// test if implementation meets criteria from the description, like:
-//    val testInput = aoc2022.utils.readTestInput()
-    val input = readInput()
+
+}
+
+fun main() {
+    val input = readInput(2022, 6)
 
 // part 1
-    ::part1.appliedTo("mjqjpqmgbljsphdztnvjfqwrcgsmlb", returns = 7)
-    ::part1.appliedTo("bvwbjplbgvbhsrlpgdmjqwftvncz", returns = 5)
-    ::part1.appliedTo("nppdvjthqldpwncqszvftbrmjlhg", returns = 6)
-    ::part1.appliedTo("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", returns = 10)
-    ::part1.appliedTo("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", returns = 11)
-    println("Part 1: ${part1(input.first())}")
+    Day06::part1 appliedTo "mjqjpqmgbljsphdztnvjfqwrcgsmlb" returns 7
+    Day06::part1 appliedTo "bvwbjplbgvbhsrlpgdmjqwftvncz" returns 5
+    Day06::part1 appliedTo "nppdvjthqldpwncqszvftbrmjlhg" returns 6
+    Day06::part1 appliedTo "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" returns 10
+    Day06::part1 appliedTo "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" returns 11
+    println("Part 1: ${Day06.part1(input.first())}")
 
 // part 2
-    ::part2.appliedTo("mjqjpqmgbljsphdztnvjfqwrcgsmlb", returns = 19)
-    ::part2.appliedTo("bvwbjplbgvbhsrlpgdmjqwftvncz", returns = 23)
-    ::part2.appliedTo("nppdvjthqldpwncqszvftbrmjlhg", returns = 23)
-    ::part2.appliedTo("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", returns = 29)
-    ::part2.appliedTo("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", returns = 26)
-    println("Part 2: ${part2(input.first())}")
+    Day06::part2 appliedTo "mjqjpqmgbljsphdztnvjfqwrcgsmlb" returns 19
+    Day06::part2 appliedTo "bvwbjplbgvbhsrlpgdmjqwftvncz" returns 23
+    Day06::part2 appliedTo "nppdvjthqldpwncqszvftbrmjlhg" returns 23
+    Day06::part2 appliedTo "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" returns 29
+    Day06::part2 appliedTo "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" returns 26
+    println("Part 2: ${Day06.part2(input.first())}")
 }
 
