@@ -62,19 +62,28 @@ object Day10 : Puzzle(2022, 10) {
     }
 
 
-    fun solve() {
+    override fun <T> solve(part1TestResult: T, part2TestResult: T) {
 
         val testInput = readTestInput()
         val input = readInput()
 
         // part 1
-        Day10::part1.appliedTo(testInput, returns = 13140)
+        ::part1.appliedTo(testInput, returns = part1TestResult)
         println("Part 1: ${part1(input)}")
 
         // part 2
         val output = part2(testInput)
-        check(
-            output.trim() == """
+        check(output.trim() == part2TestResult) {
+            "expected \n${part2TestResult} but was \n$output"
+        }
+        println("Part 2: \n${part2(input)}")
+        // ZKJFBJFZ
+    }
+}
+
+fun main() {
+    Day10.solve(
+        13140, """
 [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    |
 [][][]      [][][]      [][][]      [][][]      [][][]      [][][]      [][][]  |
 [][][][]        [][][][]        [][][][]        [][][][]        [][][][]        |
@@ -82,24 +91,7 @@ object Day10 : Puzzle(2022, 10) {
 [][][][][][]            [][][][][][]            [][][][][][]            [][][]  |
 [][][][][][][]              [][][][][][][]              [][][][][][][]          |
                     """.trimIndent().trim()
-        ) {
-            "expected \n${
-                """
-[][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    [][]    |
-[][][]      [][][]      [][][]      [][][]      [][][]      [][][]      [][][]  |
-[][][][]        [][][][]        [][][][]        [][][][]        [][][][]        |
-[][][][][]          [][][][][]          [][][][][]          [][][][][]          |
-[][][][][][]            [][][][][][]            [][][][][][]            [][][]  |
-[][][][][][][]              [][][][][][][]              [][][][][][][]          | 
-                        """.trimIndent().trim()
-            } but was \n$output" }
-        println("Part 2: \n${part2(input)}")
-        // ZKJFBJFZ
-    }
-}
-
-fun main() {
-    Day10.solve()
+    )
 }
 
 
