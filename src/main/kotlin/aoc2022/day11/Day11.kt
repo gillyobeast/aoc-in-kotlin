@@ -52,7 +52,7 @@ object Day11 : Puzzle(2022, 11) {
 
 
     private fun String.extract(regex: Regex): String =
-        regex.find(this)!!.value.trim()
+        regex.find(this)!!.destructured.component1().trim()
 
     private fun List<Monkey>.calculateMonkeyBusiness(): Long =
         sortedBy { it.activity }
