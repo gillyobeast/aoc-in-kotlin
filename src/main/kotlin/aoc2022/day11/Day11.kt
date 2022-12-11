@@ -1,61 +1,42 @@
 package aoc2022.day11
 
 import aoc2022.Puzzle
+import kotlin.system.measureTimeMillis
 
-data class Monkey(
-    val num: Int, val items: ArrayDeque<Long>, val operation: (Long) -> Long,
+class Monkey(
+    val items: ArrayDeque<Long>, val operation: (Long) -> Long,
     val testDivisibleBy: Long, val ifTrueTarget: Int, val ifFalseTarget: Int,
 ) {
     var activity = 0L
-        private set
-    fun evaluateAndThrowItemsDividingBy3(monkeys: List<Monkey>) {
+
+    fun evaluateAndThrowTo(monkeys: List<Monkey>, adjust: (Long) -> Long) {
         while (items.isNotEmpty()) {
             val inflatedWorry = operation(items.removeFirst())
-            val newWorry = inflatedWorry / 3L
+            val newWorry = adjust(inflatedWorry)
             val target =
-                if (newWorry.mod(testDivisibleBy) == 0L) ifTrueTarget
+                if (newWorry % testDivisibleBy == 0L) ifTrueTarget
                 else ifFalseTarget
-            throwTo(monkeys[target], newWorry)
+            monkeys[target].items.addLast(newWorry)
             activity++
         }
     }
 
-    fun evaluateAndThrowItems(monkeys: List<Monkey>) {
-        while (items.isNotEmpty()) {
-            val inflatedWorry: Long = operation(items.removeFirst()) % monkeys.productOfTests
-            check(inflatedWorry > 0L) { "$inflatedWorry should be positive" }
-
-            val target =
-                if (inflatedWorry % testDivisibleBy == 0L) ifTrueTarget
-                else ifFalseTarget
-            throwTo(monkeys[target], inflatedWorry)
-            activity++
-        }
+    companion object {
+        fun of(input: String) = Monkey(
+            items = ArrayDeque(
+                input.substringAfter("Starting items: ")
+                    .substringBefore("Operation:")
+                    .split(",")
+                    .map(String::trim)
+                    .map(String::toLong)
+            ),
+            operation = input.parseOperation(),
+            testDivisibleBy = input.extract("Test: divisible by (\\d+)".toRegex()).toLong(),
+            ifTrueTarget = input.extract("If true: throw to monkey (\\d+)".toRegex()).toInt(),
+            ifFalseTarget = input.extract("If false: throw to monkey (\\d+)".toRegex()).toInt()
+        )
     }
-
-    private fun throwTo(other: Monkey, item: Long) {
-        other.items.addLast(item)
-    }
-
-    private val List<Monkey>.productOfTests: Long
-        get() = map(Monkey::testDivisibleBy).product()
 }
-
-fun String.toMonkey() = Monkey(
-    num = substringBefore(":").toInt(),
-    items = ArrayDeque(
-        substringAfter("Starting items: ")
-            .substringBefore("Operation:")
-            .split(",")
-            .map(String::trim)
-            .map(String::toLong)
-    ),
-    operation = parseOperation(),
-    testDivisibleBy = extract("Test: divisible by (\\d+)".toRegex()).toLong(),
-    ifTrueTarget = extract("If true: throw to monkey (\\d+)".toRegex()).toInt(),
-    ifFalseTarget = extract("If false: throw to monkey (\\d+)".toRegex()).toInt()
-)
-
 
 fun String.parseOperation(): (Long) -> Long {
     val operation = extract("Operation: new = old ([*+]) (\\d+|old)".toRegex())
@@ -66,6 +47,7 @@ fun String.parseOperation(): (Long) -> Long {
     else { it -> it + operand.toInt() }
 }
 
+
 private fun String.extract(regex: Regex): String =
     regex.find(this)!!.destructured.component1().trim()
 
@@ -74,27 +56,35 @@ private fun List<Monkey>.calculateMonkeyBusiness(): Long =
         .takeLast(2)// should be the highest activity
         .map(Monkey::activity).product()
 
+private val List<Monkey>.productOfTests: Long
+    get() = map(Monkey::testDivisibleBy).product()
+
 private fun List<String>.toMonkeys(): List<Monkey> {
-    return joinToString("").split("Monkey".toRegex()).drop(1).map { it.trim().toMonkey() }
+    return joinToString("").split("Monkey".toRegex()).drop(1).map { Monkey.of(it.trim()) }
 }
 
 object Day11 : Puzzle(2022, 11) {
     override fun part1(input: List<String>): Long {
-        val monkeys = input.toMonkeys()
 
-        repeat(20) { _ ->
-            monkeys.onEach { it.evaluateAndThrowItemsDividingBy3(monkeys) }
-        }
-
-        return monkeys.calculateMonkeyBusiness()
+        return calculateMonkeyBusiness(20, input.toMonkeys()) { worry -> worry / 3 }
     }
 
     override fun part2(input: List<String>): Long {
 
         val monkeys = input.toMonkeys()
 
-        repeat(10_000) { _ ->
-            monkeys.onEach { it.evaluateAndThrowItems(monkeys) }
+        return calculateMonkeyBusiness(10_000, monkeys) { worry -> worry % monkeys.productOfTests }
+    }
+
+    private fun calculateMonkeyBusiness(
+        repeats: Int,
+        monkeys: List<Monkey>,
+        adjust: (Long) -> Long
+    ): Long {
+        repeat(repeats) { _ ->
+            monkeys.onEach { monkey ->
+                monkey.evaluateAndThrowTo(monkeys, adjust)
+            }
         }
 
         return monkeys.calculateMonkeyBusiness()
@@ -106,7 +96,7 @@ private fun List<Long>.product(): Long {
 }
 
 fun main() {
-    Day11.solve(10_605L, 2_713_310_158L)
+    measureTimeMillis {
+        Day11.solve(10_605L, 2_713_310_158L)
+    }.also { println("Took ${it}ms") }
 }
-
-
