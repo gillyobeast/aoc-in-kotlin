@@ -9,7 +9,7 @@ data class Monkey(
     var activity = 0
         private set
 
-    fun evaluateAndThrowItemsTo(monkeys: List<Monkey>) {
+    fun evaluateAndThrowItemsDividingBy3(monkeys: List<Monkey>) {
 //        num.andLog(": ")
 //        items.andLog("; ")
         while (items.isNotEmpty()) {
@@ -20,6 +20,20 @@ data class Monkey(
                 if (newWorry % testDivisibleBy == 0) ifTrueTarget
                 else ifFalseTarget
             throwTo(monkeys[target/*.andLog(" gets ")*/], newWorry/*.andLog("; ")*/)
+            activity++
+        }
+//        "activity = $activity".andLog("\n")
+    }
+    fun evaluateAndThrowItems(monkeys: List<Monkey>) {
+//        num.andLog(": ")
+//        items.andLog("; ")
+        while (items.isNotEmpty()) {
+            val inflatedWorry = operation(items.removeFirst())
+//                .andLog(", ")
+            val target =
+                if (inflatedWorry % testDivisibleBy == 0) ifTrueTarget
+                else ifFalseTarget
+            throwTo(monkeys[target/*.andLog(" gets ")*/], inflatedWorry/*.andLog("; ")*/)
             activity++
         }
 //        "activity = $activity".andLog("\n")
@@ -88,28 +102,44 @@ private fun String.extract(regex: Regex): String =
 
 object Day11 : Puzzle(2022, 11) {
     override fun part1(input: List<String>): Any {
-        val monkeys = input.joinToString("")
-            .split("Monkey".toRegex()).drop(1)
-//            .map { it.andLog() }
-            .map { it.trim().toMonkey() }
+        val monkeys = input.toMonkeys()
 
         repeat(20) {round ->
 //            (round + 1 ).andLog(":")
-            monkeys.onEach { it.evaluateAndThrowItemsTo(monkeys) }
+            monkeys.onEach { it.evaluateAndThrowItemsDividingBy3(monkeys) }
 //            monkeys.onEach { "\t${it.num} has ${it.items}".andLog("\n\t") }
 //            "\n".andLog()
         }
 
-        return monkeys
-            .sortedBy { it.activity }
-            .takeLast(2)/*.andLog()*/ // should be the highest activity
-            .fold(1) { product, monkey -> product * monkey.activity }
+        return monkeys.calculateMonkeyBusiness()
 //            .andLog("\n")
 
     }
 
     override fun part2(input: List<String>): Any {
-        TODO("Do part 1 first!")
+
+        val monkeys = input.toMonkeys()
+
+        repeat(10_000) { _ ->
+//            (round + 1 ).andLog(":")
+            monkeys.onEach { it.evaluateAndThrowItems(monkeys) }
+//            monkeys.onEach { "\t${it.num} has ${it.items}".andLog("\n\t") }
+//            "\n".andLog()
+        }
+
+        return monkeys.calculateMonkeyBusiness()
+//            .andLog("\n")
+    }
+
+    private fun List<Monkey>.calculateMonkeyBusiness() = sortedBy { it.activity }
+        .takeLast(2)/*.andLog()*/ // should be the highest activity
+        .fold(1) { product, monkey -> product * monkey.activity }
+
+    private fun List<String>.toMonkeys(): List<Monkey> {
+        return joinToString("")
+            .split("Monkey".toRegex()).drop(1)
+            //            .map { it.andLog() }
+            .map { it.trim().toMonkey() }
     }
 }
 
