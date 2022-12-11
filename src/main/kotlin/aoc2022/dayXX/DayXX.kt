@@ -13,7 +13,6 @@ object DayXX : Puzzle(2022, 0) {
 
 }
 
-fun main() {
-    DayXX.solve(-1, -1)
-}
+fun main() = DayXX.solve(-1, -1)
+
 
