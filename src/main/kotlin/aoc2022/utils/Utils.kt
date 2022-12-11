@@ -5,7 +5,9 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 fun readInput() = readFile("input.txt")
+fun readInput(year: Int, day: Int) = readFile("input.txt")
 fun readTestInput() = readFile("test_input.txt")
+fun readTestInput(year: Int, day: Int) = readFile("test_input.txt")
 
 private fun readFile(fileName: String) = File("src/main/resources", fileName)
     .readLines()
