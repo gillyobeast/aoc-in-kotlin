@@ -3,16 +3,38 @@ package aoc2022.day11
 import aoc2022.Puzzle
 
 data class Monkey(
-    val num: Int, val items: List<Int>, val operation: (Int) -> Int,
+    val num: Int, val items: ArrayDeque<Int>, val operation: (Int) -> Int,
     val testDivisibleBy: Int, val ifTrueTarget: Int, val ifFalseTarget: Int,
-)
+) {
+    var activity = 0
+        private set
+
+    fun evaluateAndThrowItemsTo(monkeys: List<Monkey>) {
+        while (items.isNotEmpty()) {
+            val target =
+                if (operation(items[0]) % testDivisibleBy == 0) ifTrueTarget
+                else ifFalseTarget
+            throwTo(monkeys[target], items.removeFirst() / 3)
+            activity++
+        }
+    }
+
+    private fun throwTo(other: Monkey, item: Int) {
+        other.catch(item)
+    }
+
+    private fun catch(item: Int) {
+        items.addLast(item)
+    }
+
+}
 
 fun String.toMonkey() =
     Monkey(
         num = parseNum(),
         items = parseItems(),
         operation = parseOperation(),
-        testDivisibleBy = parseTest(),
+        testDivisibleBy = parseTestDivisibleBy(),
         ifTrueTarget = parseIfTrue(),
         ifFalseTarget = parseIfFalse()
     )
@@ -28,7 +50,7 @@ private fun String.parseIfTrue(): Int {
 }
 
 
-private fun String.parseTest(): Int {
+private fun String.parseTestDivisibleBy(): Int {
     return extractInt("Test: divisible by (\\d+)".toRegex())
 }
 
@@ -41,8 +63,9 @@ fun String.parseOperation(): (Int) -> Int {
     else { it -> it + operand.toInt() }
 }
 
-private fun String.parseItems(): List<Int> =
-    extract("Starting items: ((\\d+,?)\\s?)+".toRegex()).split(",").map(String::toInt)
+private fun String.parseItems(): ArrayDeque<Int> =
+    ArrayDeque(extract("Starting items: ((\\d+,?)\\s?)+".toRegex()).split(",").map(String::toInt))
+
 
 private fun String.extractInt(regex: Regex): Int {
     return extract(regex).toInt()
@@ -53,11 +76,19 @@ private fun String.extract(regex: Regex): String =
 
 object Day11 : Puzzle(2022, 11) {
     override fun part1(input: List<String>): Any {
-        input.joinToString("")
+        val monkeys = input.joinToString("")
             .split("Monkey".toRegex()).drop(1)
+            .map { it.andLog() }
             .map { it.trim().toMonkey().andLog() }
+            .sortedBy { it.activity };
 
-        TODO("Return something, dummy!")
+        repeat(20) { monkeys.onEach { it.evaluateAndThrowItemsTo(monkeys) } }
+
+        return monkeys
+            .takeLast(2).andLog() // should be the highest activity
+            .fold(1) { product, monkey -> product * monkey.activity }
+            .andLog()
+
     }
 
     override fun part2(input: List<String>): Any {
