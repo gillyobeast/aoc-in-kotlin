@@ -1,11 +1,21 @@
 package aoc2022.day01
 
-import aoc2022.utils.appliedTo
-import aoc2022.utils.readInput
-import aoc2022.utils.readTestInput
+import aoc2022.Puzzle
 
-fun main() {
-    fun caloriesPerElf(input: List<String>): MutableList<Int> {
+object Day01 : Puzzle(2022, 1) {
+    override fun part1(input: List<String>): Any {
+        return caloriesPerElf(input)
+            .max()
+    }
+
+    override fun part2(input: List<String>): Any {
+        return caloriesPerElf(input)
+            .sortedDescending()
+            .take(3)
+            .sum()
+    }
+
+    private fun caloriesPerElf(input: List<String>): MutableList<Int> {
         val elvesCalories = mutableListOf<Int>()
         var total = 0
         input.forEach {
@@ -19,27 +29,9 @@ fun main() {
         elvesCalories.add(total)
         return elvesCalories
     }
+}
 
-    fun maxTotalCalories(input: List<String>): Int {
-        return caloriesPerElf(input)
-            .max()
-    }
-
-    fun totalCaloriesForTop3Elves(input: List<String>): Int {
-        return caloriesPerElf(input)
-            .sortedDescending()
-            .take(3)
-//            .also(::println)
-            .sum()
-    }
-
-    // test if implementation meets criteria from the description, like:
-    val testInput = readTestInput()
-    ::maxTotalCalories.appliedTo(testInput, returns = 24000)
-    ::totalCaloriesForTop3Elves.appliedTo(testInput, returns = 45000)
-
-    val input = readInput()
-    println("Max total calories: ${maxTotalCalories(input)}")
-    println("Top 3 elves' total: ${totalCaloriesForTop3Elves(input)}")
+fun main() {
+    Day01.solve(24000, 45000)
 }
 
