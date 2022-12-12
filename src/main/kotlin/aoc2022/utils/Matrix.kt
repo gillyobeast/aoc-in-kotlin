@@ -34,6 +34,17 @@ operator fun <E> Matrix<E>.get(
     return Triple(row, column, tree)
 }
 
+
+fun <E> Matrix<E>.iterate(block: (Int, Int, E) -> Unit) {
+    indices.forEach { rowIndex ->
+        this[rowIndex].forEachIndexed { colIndex, it ->
+            block(
+                rowIndex, colIndex, it
+            )
+        }
+    }
+}
+
 fun <E> Matrix<E>.column(i: Int): List<E> {
     return map { it[i] }.toList()
 }

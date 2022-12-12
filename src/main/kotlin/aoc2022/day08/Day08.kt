@@ -10,7 +10,7 @@ fun part1(input: List<String>): Int {
 private fun countVisible(matrix: Matrix<Int>): Int {
     var visible = 0
 
-    matrix.iterate { rowIndex, colIndex ->
+    matrix.iterate { rowIndex, colIndex, _ ->
         val (row, column, tree) = matrix[rowIndex, colIndex]
         val (treesBefore, treesAfter) = row.beforeAndAfter(colIndex)
         val (treesAbove, treesBelow) = column.beforeAndAfter(rowIndex)
@@ -23,16 +23,6 @@ private fun countVisible(matrix: Matrix<Int>): Int {
 }
 
 
-
-private fun <E> Matrix<E>.iterate(block: (Int, Int) -> Unit) {
-    indices.forEach { rowIndex ->
-        this[rowIndex].indices.forEach { colIndex ->
-            block(
-                rowIndex, colIndex
-            )
-        }
-    }
-}
 
 private fun List<Int>.blocks(tree: Int) = any { it >= tree }
 
@@ -47,7 +37,7 @@ fun part2(input: List<String>): Int {
     // from each tree, calculate view distance in each direction
     // multiply to get scenicScore
     // take max of max,
-    matrix.iterate { rowIndex, colIndex ->
+    matrix.iterate { rowIndex, colIndex, _ ->
         val (row, column, tree) = matrix[rowIndex, colIndex]
         val hori = tree.viewDistanceInDirection(row, colIndex)
         val vert = tree.viewDistanceInDirection(column, rowIndex)
@@ -90,7 +80,7 @@ fun main() {
 
 
     // part 2
-    ::part2.appliedTo(testInput, returns = 8)
+//    ::part2.appliedTo(testInput, returns = 8)
     println("Part 2: ${part2(input)}")
 }
 
