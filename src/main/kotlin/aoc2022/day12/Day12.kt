@@ -14,6 +14,6 @@ object Day12 : Puzzle(2022, 12) {
 }
 
 fun main() {
-    Day12.solve(-1, -1)
+    Day12.solve(31, -1)
 }
 
