@@ -1,9 +1,15 @@
 package aoc2022.utils
 
+import org.jgrapht.GraphPath
+import org.jgrapht.graph.DefaultEdge
+
 typealias Matrix<E> = List<List<E>>
 
 fun <E> Matrix<E>.prettyPrint() {
-    println(joinToString("\n"))
+    println(map{it.joinToString (" ")}.joinToString("\n"))
+}
+fun <E> Matrix<E>.prettyPrint(path: GraphPath<Pair<Int, Int>, DefaultEdge>) {
+//    println(map{it.joinToString {if (path.edgeList.contains(it))}}.joinToString("\n"))
 }
 
 fun matrixOf(input: List<String>): Matrix<Int> = input.map {
@@ -35,10 +41,10 @@ operator fun <E> Matrix<E>.get(
 }
 
 
-fun <E> Matrix<E>.iterate(block: (Int, Int, E) -> Unit) {
+fun <E> Matrix<E>.iterate(block: Matrix<E>.(Int, Int, E) -> Unit) {
     indices.forEach { rowIndex ->
         this[rowIndex].forEachIndexed { colIndex, it ->
-            block(
+            this.block(
                 rowIndex, colIndex, it
             )
         }
