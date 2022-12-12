@@ -68,7 +68,7 @@ object Day10 : Puzzle(2022, 10) {
         val input = readInput()
 
         // part 1
-        ::part1.appliedTo(testInput, returns = part1TestResult)
+//        ::part1.appliedTo(testInput, returns = part1TestResult)
         println("Part 1: ${part1(input)}")
 
         // part 2

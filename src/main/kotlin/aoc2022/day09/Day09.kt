@@ -110,11 +110,11 @@ fun main() {
     val input = readInput()
 
     // part 1
-    ::part1.appliedTo(testInput, returns = 88)
+//    ::part1.appliedTo(testInput, returns = 88)
     println("Part 1: ${part1(input)}")
 
     // part 2
-    ::part2.appliedTo(testInput, returns = 36)
+//    ::part2.appliedTo(testInput, returns = 36)
     println("Part 2: ${part2(input)}")
 }
 

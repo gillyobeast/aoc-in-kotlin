@@ -87,13 +87,13 @@ fun main() {
     val input = readInput()
 
     // part 1
-    ::part1.appliedTo(testInput, returns = 95437)
+//    ::part1.appliedTo(testInput, returns = 95437)
     val part1 = part1(input)
     println("Part 1: $part1")
     check(part1 != 2127288) { "Shouldn't be 2127288!" }
 
     // part 2
-    ::part2.appliedTo(testInput, returns = 24933642)
+//    ::part2.appliedTo(testInput, returns = 24933642)
     val part2 = part2(input)
     println("Part 2: $part2")
     check(part2 != 14694309) { "Shouldn't be 14694309!" }
