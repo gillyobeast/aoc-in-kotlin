@@ -14,6 +14,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.jgrapht:jgrapht-core:1.5.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.1")
 }
 
 tasks.test {
