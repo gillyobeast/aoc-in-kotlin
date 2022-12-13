@@ -3,10 +3,9 @@ package aoc2022.day12
 import aoc2022.Puzzle
 import aoc2022.utils.*
 import org.jgrapht.Graph
-import org.jgrapht.GraphPath
 import org.jgrapht.alg.shortestpath.AStarShortestPath
+import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
-import org.jgrapht.graph.DefaultUndirectedGraph
 import org.jgrapht.graph.builder.GraphBuilder
 
 object Day12 : Puzzle(2022, 12) {
@@ -27,7 +26,7 @@ object Day12 : Puzzle(2022, 12) {
         val map: Matrix<Char> = input.map { it.toList() }
         val (start, end) = map.startAndEndPoints()
         val graph: Graph<Point2D<Int>, DefaultEdge> =
-            DefaultUndirectedGraph(DefaultEdge::class.java)
+            DefaultDirectedGraph(DefaultEdge::class.java)
         val builder = GraphBuilder(graph)
         builder.addVertices(start, end)
         map.iterate(builder.addEdge())
@@ -36,7 +35,7 @@ object Day12 : Puzzle(2022, 12) {
                 .getPath(start, end)
         println()
         println(path)
-        map.prettyPrint(path)
+        map.prettyPrint(path.vertexList!!)
 
         return path.length
     }
@@ -48,7 +47,7 @@ object Day12 : Puzzle(2022, 12) {
             val here = rowIndex to colIndex
             addVertex(here)
             val (row, column) = this[rowIndex, colIndex]
-            val neighbourhood = value - 1..value + 1
+            val neighbourhood = 0..value + 1
             if (rowIndex > 0 && column[rowIndex - 1].int in neighbourhood) {
                 val source = rowIndex - 1 to colIndex
                 add(here, source)
