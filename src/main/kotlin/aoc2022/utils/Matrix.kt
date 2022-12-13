@@ -1,15 +1,17 @@
 package aoc2022.utils
 
-import org.jgrapht.GraphPath
-import org.jgrapht.graph.DefaultEdge
-
 typealias Matrix<E> = List<List<E>>
 
 fun <E> Matrix<E>.prettyPrint() {
-    println(map{it.joinToString (" ")}.joinToString("\n"))
+    println(map { it.joinToString(" ") }.joinToString("\n"))
 }
-fun <E> Matrix<E>.prettyPrint(path: GraphPath<Pair<Int, Int>, DefaultEdge>) {
-//    println(map{it.joinToString {if (path.edgeList.contains(it))}}.joinToString("\n"))
+
+fun <E> Matrix<E>.prettyPrint(path: MutableList<Pair<Int, Int>>) {
+    println(mapIndexed { rowIndex, row ->
+        row.mapIndexed { colIndex, value ->
+            (if (path.contains(rowIndex to colIndex)) ">" else " ") + value.toString()
+        }.joinToString("")
+    }.joinToString("\n"))
 }
 
 fun matrixOf(input: List<String>): Matrix<Int> = input.map {
