@@ -25,7 +25,7 @@ object Day12 : Puzzle(2022, 12) {
     override fun part1(input: List<String>): Int {
         val map: Matrix<Char> = input.map { it.toList() }
         val (start, end) = map.startAndEndPoints()
-        val graph: Graph<Point2D<Int>, DefaultEdge> =
+        val graph: Graph<Point, DefaultEdge> =
             DefaultDirectedGraph(DefaultEdge::class.java)
         val builder = GraphBuilder(graph)
         builder.addVertices(start, end)
@@ -40,8 +40,8 @@ object Day12 : Puzzle(2022, 12) {
         return path.length
     }
 
-    private fun GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>.addEdge(
-        edgeAddFun: (GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>, Pair<Int, Int>, Pair<Int, Int>) -> Unit,
+    private fun GraphBuilder<Point, DefaultEdge, Graph<Point, DefaultEdge>>.addEdge(
+        edgeAddFun: (GraphBuilder<Point, DefaultEdge, Graph<Point, DefaultEdge>>, Pair<Int, Int>, Pair<Int, Int>) -> Unit,
         neighbourhoodFactory: (Int) -> IntRange
     )
             : Matrix<Char>.(Int, Int, Char) -> Unit =
@@ -78,7 +78,7 @@ object Day12 : Puzzle(2022, 12) {
     }
 
     private fun add(
-        graphBuilder: GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>,
+        graphBuilder: GraphBuilder<Point, DefaultEdge, Graph<Point, DefaultEdge>>,
         here: Pair<Int, Int>,
         source: Pair<Int, Int>
     ) {
@@ -86,7 +86,7 @@ object Day12 : Puzzle(2022, 12) {
     }
 
     private fun addReverse(
-        graphBuilder: GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>,
+        graphBuilder: GraphBuilder<Point, DefaultEdge, Graph<Point, DefaultEdge>>,
         here: Pair<Int, Int>,
         source: Pair<Int, Int>
     ) {
@@ -94,8 +94,8 @@ object Day12 : Puzzle(2022, 12) {
     }
 
     private fun Matrix<Char>.startAndEndPoints(): Pair<Pair<Int, Int>, Pair<Int, Int>> {
-        var start: Point2D<Int>? = null
-        var end: Point2D<Int>? = null
+        var start: Point? = null
+        var end: Point? = null
         iterate { rowIndex, colIndex, it ->
             if (it == 'S') start = rowIndex to colIndex
             if (it == 'E') end = rowIndex to colIndex
@@ -103,8 +103,8 @@ object Day12 : Puzzle(2022, 12) {
         return start!! to end!!
     }
 
-    private fun `find all 'a's`(map: Matrix<Char>): List<Point2D<Int>> {
-        val mutableList = mutableListOf<Point2D<Int>>()
+    private fun `find all 'a's`(map: Matrix<Char>): List<Point> {
+        val mutableList = mutableListOf<Point>()
         map.iterate { rowIndex, colIndex, char ->
             if (char == 'a') {
                 mutableList.add(rowIndex to colIndex)
@@ -115,10 +115,10 @@ object Day12 : Puzzle(2022, 12) {
 
     override fun part2(input: List<String>): Any {
         val map: Matrix<Char> = input.map { it.toList() }
-        val (start, end) = map.startAndEndPoints()
-        val graph: Graph<Point2D<Int>, DefaultEdge> =
+        val graph: Graph<Point, DefaultEdge> =
             DefaultDirectedGraph(DefaultEdge::class.java)
         val builder = GraphBuilder(graph)
+        val (start, end) = map.startAndEndPoints()
         builder.addVertices(start, end)
         map.iterate(builder.addEdge(Day12::addReverse, Day12::oneMinusToMax))
         val pathFinder =
