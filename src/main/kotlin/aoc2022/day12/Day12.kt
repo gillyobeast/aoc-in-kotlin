@@ -29,7 +29,7 @@ object Day12 : Puzzle(2022, 12) {
             DefaultDirectedGraph(DefaultEdge::class.java)
         val builder = GraphBuilder(graph)
         builder.addVertices(start, end)
-        map.iterate(builder.addEdge())
+        map.iterate(builder.addEdge(Day12::add, Day12::zeroToOnePlus))
         val path =
             AStarShortestPath(graph) { a, b -> (a.first - b.first) + (a.second - b.second).toDouble() }
                 .getPath(start, end)
@@ -40,38 +40,57 @@ object Day12 : Puzzle(2022, 12) {
         return path.length
     }
 
-    private fun GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>.addEdge()
+    private fun GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>.addEdge(
+        edgeAddFun: (GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>, Pair<Int, Int>, Pair<Int, Int>) -> Unit,
+        neighbourhoodFactory: (Int) -> IntRange
+    )
             : Matrix<Char>.(Int, Int, Char) -> Unit =
         { rowIndex, colIndex, it ->
             val value = it.int
             val here = rowIndex to colIndex
             addVertex(here)
             val (row, column) = this[rowIndex, colIndex]
-            val neighbourhood = 0..value + 1
+            val neighbourhood = neighbourhoodFactory.invoke(value)
             if (rowIndex > 0 && column[rowIndex - 1].int in neighbourhood) {
                 val source = rowIndex - 1 to colIndex
-                add(here, source)
+                edgeAddFun(this@addEdge, here, source)
             }
             if (rowIndex < column.lastIndex && column[rowIndex + 1].int in neighbourhood) {
                 val source = rowIndex + 1 to colIndex
-                add(here, source)
+                edgeAddFun(this@addEdge, here, source)
             }
             if (colIndex > 0 && row[colIndex - 1].int in neighbourhood) {
                 val source = rowIndex to colIndex - 1
-                add(here, source)
+                edgeAddFun(this@addEdge, here, source)
             }
             if (colIndex < row.lastIndex && row[colIndex + 1].int in neighbourhood) {
                 val source = rowIndex to colIndex + 1
-                add(here, source)
+                edgeAddFun(this@addEdge, here, source)
             }
         }
 
-    private fun GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>.add(
+    private fun zeroToOnePlus(value: Int): IntRange {
+        return 0..value + 1
+    }
+
+    private fun oneMinusToMax(value: Int): IntRange {
+        return value - 1..28
+    }
+
+    private fun add(
+        graphBuilder: GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>,
         here: Pair<Int, Int>,
         source: Pair<Int, Int>
     ) {
-        addEdge(here, source)
-//        println("adding edge from $here to $source")
+        graphBuilder.addEdge(here, source)
+    }
+
+    private fun addReverse(
+        graphBuilder: GraphBuilder<Point2D<Int>, DefaultEdge, Graph<Point2D<Int>, DefaultEdge>>,
+        here: Pair<Int, Int>,
+        source: Pair<Int, Int>
+    ) {
+        graphBuilder.addEdge(here, source)
     }
 
     private fun Matrix<Char>.startAndEndPoints(): Pair<Pair<Int, Int>, Pair<Int, Int>> {
@@ -84,14 +103,44 @@ object Day12 : Puzzle(2022, 12) {
         return start!! to end!!
     }
 
+    private fun `find all 'a's`(map: Matrix<Char>): List<Point2D<Int>> {
+        val mutableList = mutableListOf<Point2D<Int>>()
+        map.iterate { rowIndex, colIndex, char ->
+            if (char == 'a') {
+                mutableList.add(rowIndex to colIndex)
+            }
+        }
+        return mutableList
+    }
+
     override fun part2(input: List<String>): Any {
-        TODO("Not yet implemented")
+        val map: Matrix<Char> = input.map { it.toList() }
+        val (start, end) = map.startAndEndPoints()
+        val graph: Graph<Point2D<Int>, DefaultEdge> =
+            DefaultDirectedGraph(DefaultEdge::class.java)
+        val builder = GraphBuilder(graph)
+        builder.addVertices(start, end)
+        map.iterate(builder.addEdge(Day12::addReverse, Day12::oneMinusToMax))
+        val pathFinder =
+            AStarShortestPath(graph) { a, b -> (a.first - b.first) + (a.second - b.second).toDouble() }
+
+        var shortestPath = pathFinder.getPath(end, start)
+        for (a in `find all 'a's`(map)) {
+            val newPath = pathFinder.getPath(end, a)
+            if (newPath != null && newPath.length < shortestPath.length)
+                shortestPath = newPath
+        }
+        println()
+        println(shortestPath)
+        map.prettyPrint(shortestPath.vertexList!!)
+
+        return shortestPath.length
     }
 
 }
 
 
 fun main() {
-    Day12.solve(31, -1)
+    Day12.solve(31, 29)
 }
 
