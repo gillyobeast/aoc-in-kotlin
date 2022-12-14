@@ -23,7 +23,7 @@ object Day06 {
 }
 
 fun main() {
-    val input = readInput(2022, 6)
+    val input = readInput()
 
 // part 1
     Day06::part1 appliedTo "mjqjpqmgbljsphdztnvjfqwrcgsmlb" returns 7
