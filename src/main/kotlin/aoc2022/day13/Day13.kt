@@ -2,7 +2,7 @@ package aoc2022.day13
 
 import aoc2022.Puzzle
 import aoc2022.utils.andLog
-import aoc2022.utils.toPair
+import aoc2022.utils.toPoint
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -13,7 +13,7 @@ object Day13 : Puzzle(2022, 13) {
 
     override fun part1(input: List<String>): Any {
         val pairs = input.joinToString("\n").split("\n\n")
-            .map { lines -> lines.split("\n").map { it.parse() }.toPair() }
+            .map { lines -> lines.split("\n").map { it.parse() }.toPoint() }
 
 
         return pairs

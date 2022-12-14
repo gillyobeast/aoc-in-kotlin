@@ -18,7 +18,7 @@ fun <E> E.andLog(extra: Any = ""): E {
     return also { println(extra.toString() + this) }
 }
 
-fun <E> List<E>.toPair(): Pair<E, E> {
+fun <E> List<E>.toPoint(): Point2D<E> {
     check(this.size == 2) { "Can only make a pair out of two values" }
     return this[0] to this[1]
 }
