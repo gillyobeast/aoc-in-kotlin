@@ -203,3 +203,5 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,kotlin,gradle,intellij+iml
 
 
+/src/main/resources/input.txt
+/src/main/resources/test_input.txt

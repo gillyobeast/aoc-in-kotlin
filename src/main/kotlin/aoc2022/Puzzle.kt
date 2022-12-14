@@ -10,9 +10,10 @@ abstract class Puzzle(private val year: Int, private val day: Int) {
     abstract fun part1(input: List<String>): Any
     abstract fun part2(input: List<String>): Any
     open fun <T> solve(part1TestResult: T, part2TestResult: T) {
-        val testInput = readTestInput(year, day)
-        val input = readInput(year, day)
+        val testInput = readTestInput()
+        val input = readInput()
 
+        println("$year - day $day\n")
         // part 1
         ::part1 appliedTo testInput returns part1TestResult
         printTimeMillis {
