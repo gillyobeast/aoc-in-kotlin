@@ -1,6 +1,8 @@
 package aoc2022.day13
 
 import aoc2022.Puzzle
+import aoc2022.utils.andLog
+import aoc2022.utils.toPair
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -16,7 +18,7 @@ object Day13 : Puzzle(2022, 13) {
 
         return pairs
             .associateWith { pairs.indexOf(it) }
-            .map { println("\n== Pair ${it.value+1} =="); it.value to it.key.isCorrectOrder() }
+            .map { println("\n== Pair ${it.value + 1} =="); it.value to it.key.isCorrectOrder() }
             .toMap()
             .filter { it.value }
             .keys
@@ -68,14 +70,6 @@ object Day13 : Puzzle(2022, 13) {
     }
 }
 
-private fun <E> E.andLog(extra: Any = ""): E {
-    return also { println(extra.toString() + this) }
-}
-
-private fun <E> List<E>.toPair(): Pair<E, E> {
-    check(this.size == 2) { "Can only make a pair out of two values" }
-    return this[0] to this[1]
-}
 
 fun main() {
     Day13.solve(13, -1)

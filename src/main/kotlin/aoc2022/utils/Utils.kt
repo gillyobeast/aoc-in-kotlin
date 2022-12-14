@@ -14,6 +14,15 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
     .toString(16)
     .padStart(32, '0')
 
+fun <E> E.andLog(extra: Any = ""): E {
+    return also { println(extra.toString() + this) }
+}
+
+fun <E> List<E>.toPair(): Pair<E, E> {
+    check(this.size == 2) { "Can only make a pair out of two values" }
+    return this[0] to this[1]
+}
+
 infix fun <L, T> ((L) -> T).appliedTo(
     input: L
 ): T {
