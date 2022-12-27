@@ -33,7 +33,7 @@ infix fun <T> T.returns(result: T) {
     check(this == result) { "expected $result but was $this" }
 }
 
-fun <T> T.shouldNotBe(equalTo: T): T {
+infix fun <T> T.shouldNotBe(equalTo: T): T {
     check(this != equalTo) { "Shouldn't be $equalTo" }
     return this
 }
