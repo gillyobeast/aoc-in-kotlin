@@ -9,14 +9,19 @@ import kotlin.reflect.KProperty1
 object Day14 : Puzzle(2022, 14) {
     override fun part1(input: List<String>): Any {
         val rocks = mutableSetOf<Point>()
-        var minX= 500
-        val yRange =
+        var minY = 500
+        val updateMinY = { it: Int -> minY = if (it < minY) it else minY }
+        var (minX, maxX) = 0 to 0
+        val updateXRange = { it: Int -> if (it < minX) minX = it; if (maxX < it) maxX = it }
         input.parsePoints().andLog()
             .forEach { points ->
                 for ((index, from) in points.dropLast(1).withIndex()) {
                     val to = points[index + 1]
-                    for (point in pointsBetween(from, to))
+                    for (point in pointsBetween(from, to)) {
                         rocks.add(point)
+                        updateMinY(point.second)
+                        updateXRange(point.first)
+                    }
                 }
             }
 
