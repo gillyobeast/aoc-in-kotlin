@@ -1,12 +1,20 @@
 package aoc2022.day14
 
 import aoc2022.Puzzle
-import aoc2022.utils.prettyPrint
+import aoc2022.utils.Matrix
 import kotlin.reflect.KProperty1
 
 const val ROCK = '#'
 const val AIR = '.'
 const val SAND = 'o'
+
+fun <E> Matrix<E>.prettyPrint(path: List<Point>) {
+    println(mapIndexed { rowIndex, row ->
+        row.mapIndexed { colIndex, value ->
+            (if (path.contains(Point(rowIndex, colIndex))) ">" else " ") + value.toString()
+        }.joinToString("")
+    }.joinToString("\n"))
+}
 
 data class Point(val x: Int, val y: Int) {
     override fun toString(): String {
@@ -23,8 +31,80 @@ fun Pair<Int, Int>.toPoint(): Point {
     return Point(first, second)
 }
 
+private val rockOrSand = setOf(ROCK, SAND)
+
 object Day14 : Puzzle(2022, 14) {
     override fun part1(input: List<String>): Any {
+        val (xTmp, yTmp) = extracted(input)
+        val (minX, maxX) = xTmp
+        val (maxY, rocks) = yTmp
+
+        val cave: MutableList<MutableList<Char>> = mutableListOf()
+        // rows then columns
+        repeat(maxY) { rowIdx ->
+            val row = mutableListOf<Char>()
+            repeat(maxX - minX) { colIdx ->
+                if (Point(colIdx + 1 + minX, rowIdx + 1) in rocks) {
+                    row.add(ROCK)
+                } else row.add(AIR)
+            }
+            cave.add(row)
+        }
+//        cave.prettyPrint()
+        try {
+            var sands = 0
+            while (sands++ < 10_000) {
+                // in this loop, one unit of sand is moved through the cave.
+                var sand = Point(500, 0)
+                val path = mutableListOf(sand)
+                var moves = 0
+                while (moves++ < maxY) {
+                    // in this loop, the unit of sand moves down one unit if it can,
+                    //  moving diagonally as necessary
+                    var xCandidate = sand.x
+                    val yCandidate = sand.y + 1
+                    // try below
+                    val row = cave[yCandidate]
+                    if (row[xCandidate - minX] !in rockOrSand) {
+                        // if not blocked
+                        sand = Point(xCandidate, yCandidate)
+                        path.add(sand)
+                        continue
+                    }
+                    // try diagonally left
+                    xCandidate = sand.x - 1
+                    if (row[xCandidate - minX] !in rockOrSand) {
+                        sand = Point(xCandidate, yCandidate)
+                        path.add(sand)
+                        continue
+                    }
+                    // try diagonally right
+                    xCandidate = sand.x + 1
+                    if (row[xCandidate - minX] !in rockOrSand) {
+                        sand = Point(xCandidate, yCandidate)
+                        path.add(sand)
+                        continue
+                    }
+
+                    cave[yCandidate - 1][sand.x - minX] = SAND
+                    break
+                }
+                println("-".repeat((maxX - minX) * 2 - 1))
+                cave.prettyPrint(path)
+                if (sand.y > maxY)
+                    break
+            }
+        } catch (e: IndexOutOfBoundsException) {
+            // consume - means we
+            println(e)
+        }
+
+//        println("-".repeat((maxX - minX) * 2 - 1))
+//        cave.prettyPrint()
+        return cave.sumOf { row -> row.count { it == SAND } }
+    }
+
+    private fun extracted(input: List<String>): Pair<Pair<Int, Int>, Pair<Int, MutableSet<Point>>> {
         val rocks = mutableSetOf<Point>()
         var maxY = 0
         val updateMinY = { it: Int -> if (maxY < it) maxY = it }
@@ -41,61 +121,10 @@ object Day14 : Puzzle(2022, 14) {
                 }
             }
 
-        println("minX = $minX")
-        println("maxX = $maxX")
-        println("maxY = $maxY")
-
-        val cave: MutableList<MutableList<Char>> = mutableListOf()
-        // rows then columns
-        repeat(maxY) { rowIdx ->
-            val row = mutableListOf<Char>()
-            repeat(maxX - minX) { colIdx ->
-                if (Point(colIdx + 1 + minX, rowIdx + 1) in rocks) {
-                    row.add(ROCK)
-                } else row.add(AIR)
-            }
-            cave.add(row)
-        }
-        cave.prettyPrint()
-
-        val rocksAndSand = rocks.toMutableSet()
-        untilFalse {
-            // in this loop, one unit of sand is moved through the cave.
-            var sand = Point(500, 0)
-            var count = 0
-            while (count++ < maxY) {
-                var nextPoint = sand.copy(y = sand.y + 1)
-                if (nextPoint !in rocksAndSand) {
-                    sand = nextPoint
-                    continue
-                }
-                nextPoint = nextPoint.copy(x = nextPoint.x - 1)
-                if (nextPoint in rocksAndSand) {
-                    sand = nextPoint
-                    continue
-                }
-                nextPoint = nextPoint.copy(x = nextPoint.x + 2)
-                if (nextPoint !in rocksAndSand) {
-                    sand = nextPoint
-                    continue
-                }
-                rocksAndSand.add(sand)
-                break
-            }
-
-            return@untilFalse sand.y <= maxY
-        }
-
-        println("-".repeat((maxX - minX) * 2 - 1))
-        cave.prettyPrint()
-        return rocksAndSand.minus(rocks).size
-    }
-
-    private fun untilFalse(limit: Int = 10_000, block: (Int) -> Boolean) {
-        var count = 0
-        @Suppress("ControlFlowWithEmptyBody")
-        while (block(count) && count++ > limit) {
-        }
+//        println("minX = $minX")
+//        println("maxX = $maxX")
+//        println("maxY = $maxY")
+        return (minX to maxX) to (maxY to rocks)
     }
 
     private fun pointsBetween(from: Point, to: Point): Set<Point> {
@@ -108,6 +137,7 @@ object Day14 : Puzzle(2022, 14) {
         return set.toSet()
     }
 
+
     private fun intRange(
         to: Point,
         from: Point,
@@ -119,7 +149,6 @@ object Day14 : Puzzle(2022, 14) {
         else
             property(to)..property(from)
     }
-
 
     operator fun Point.minus(from: Point): Point {
         return (this.x - from.x to this.y - from.y).toPoint()
