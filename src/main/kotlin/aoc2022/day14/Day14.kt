@@ -6,12 +6,12 @@ import kotlin.reflect.KProperty1
 
 const val ROCK = '#'
 const val AIR = '.'
-const val SAND = 'o'
+const val SAND = 'x'
 
-fun <E> Matrix<E>.prettyPrint(path: List<Point>) {
+fun <E> Matrix<E>.prettyPrint(path: List<Point>, minX: Int) {
     println(mapIndexed { rowIndex, row ->
         row.mapIndexed { colIndex, value ->
-            (if (path.contains(Point(rowIndex, colIndex))) ">" else " ") + value.toString()
+            (if (path.contains(Point(rowIndex, colIndex + minX))) ">" else " ") + value.toString()
         }.joinToString("")
     }.joinToString("\n"))
 }
@@ -53,9 +53,9 @@ object Day14 : Puzzle(2022, 14) {
 //        cave.prettyPrint()
         try {
             var sands = 0
-            while (sands++ < 10_000) {
+            outer@while (sands++ < 10_000) {
                 // in this loop, one unit of sand is moved through the cave.
-                var sand = Point(500, 0)
+                var sand = Point(499, 0)
                 val path = mutableListOf(sand)
                 var moves = 0
                 while (moves++ < maxY) {
@@ -63,9 +63,12 @@ object Day14 : Puzzle(2022, 14) {
                     //  moving diagonally as necessary
                     var xCandidate = sand.x
                     val yCandidate = sand.y + 1
+                    if (yCandidate >= maxY){
+                        break@outer
+                    }
                     // try below
                     val row = cave[yCandidate]
-                    if (row[xCandidate - minX] !in rockOrSand) {
+                    if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
                         // if not blocked
                         sand = Point(xCandidate, yCandidate)
                         path.add(sand)
@@ -73,14 +76,14 @@ object Day14 : Puzzle(2022, 14) {
                     }
                     // try diagonally left
                     xCandidate = sand.x - 1
-                    if (row[xCandidate - minX] !in rockOrSand) {
+                    if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
                         sand = Point(xCandidate, yCandidate)
                         path.add(sand)
                         continue
                     }
                     // try diagonally right
                     xCandidate = sand.x + 1
-                    if (row[xCandidate - minX] !in rockOrSand) {
+                    if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
                         sand = Point(xCandidate, yCandidate)
                         path.add(sand)
                         continue
@@ -90,18 +93,18 @@ object Day14 : Puzzle(2022, 14) {
                     break
                 }
                 println("-".repeat((maxX - minX) * 2 - 1))
-                cave.prettyPrint(path)
+                cave.prettyPrint(path, minX)
                 if (sand.y > maxY)
                     break
             }
         } catch (e: IndexOutOfBoundsException) {
-            // consume - means we
+            // consume - means we fell out of the cave
             println(e)
         }
 
 //        println("-".repeat((maxX - minX) * 2 - 1))
 //        cave.prettyPrint()
-        return cave.sumOf { row -> row.count { it == SAND } }
+        return cave.sumOf { row -> row.count { it == SAND } } +1
     }
 
     private fun extracted(input: List<String>): Pair<Pair<Int, Int>, Pair<Int, MutableSet<Point>>> {
