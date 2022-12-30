@@ -1,10 +1,19 @@
 package aoc2022.day14
 
 import aoc2022.Puzzle
-import aoc2022.utils.Point
 import aoc2022.utils.andLog
-import aoc2022.utils.toPoint
 import kotlin.reflect.KProperty1
+
+data class Point(val x: Int, val y: Int)
+
+fun List<Int>.toPoint(): Point {
+    check(this.size == 2) { "Can only make a pair out of two values" }
+    return Point(this[0], this[1])
+}
+
+fun Pair<Int, Int>.toPoint(): Point {
+    return Point(first, second)
+}
 
 object Day14 : Puzzle(2022, 14) {
     override fun part1(input: List<String>): Any {
@@ -18,8 +27,8 @@ object Day14 : Puzzle(2022, 14) {
                 points.windowed(2) { (from, to) ->
                     for (point in pointsBetween(from, to)) {
                         rocks.add(point)
-                        updateMinY(point.second)
-                        updateXRange(point.first)
+                        updateMinY(point.y)
+                        updateXRange(point.x)
                     }
                 }
             }
@@ -29,19 +38,19 @@ object Day14 : Puzzle(2022, 14) {
         TODO("Not yet implemented")
     }
 
-    private fun pointsBetween(from: Pair<Int, Int>, to: Pair<Int, Int>): Set<Point> {
+    private fun pointsBetween(from: Point, to: Point): Set<Point> {
         val set = mutableSetOf<Point>()
-        for (x in intRange(to, from, Point::first)) {
-            for (y in intRange(to, from, Point::second)) {
-                set.add(x to y)
+        for (x in intRange(to, from, Point::x)) {
+            for (y in intRange(to, from, Point::y)) {
+                set.add((x to y).toPoint())
             }
         }
         return set.toSet()
     }
 
     private fun intRange(
-        to: Pair<Int, Int>,
-        from: Pair<Int, Int>,
+        to: Point,
+        from: Point,
         property: KProperty1<Point, Int>,
     ): IntRange {
 
@@ -53,7 +62,7 @@ object Day14 : Puzzle(2022, 14) {
 
 
     operator fun Point.minus(from: Point): Point {
-        return this.first - from.first to this.second - from.second
+        return (this.x - from.x to this.y - from.y).toPoint()
     }
 
     private fun List<String>.parsePoints(): List<List<Point>> = map { line ->
