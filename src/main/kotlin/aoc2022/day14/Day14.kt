@@ -2,6 +2,7 @@ package aoc2022.day14
 
 import aoc2022.Puzzle
 import aoc2022.utils.andLog
+import aoc2022.utils.prettyPrint
 import kotlin.reflect.KProperty1
 
 const val ROCK = '#'
@@ -46,6 +47,23 @@ object Day14 : Puzzle(2022, 14) {
         println("maxY = ${maxY}")
 
         println(rocks)
+
+        val cave: MutableList<MutableList<Char>> = mutableListOf()
+        // rows then columns
+        repeat(maxY) { rowIdx ->
+            val row = mutableListOf<Char>()
+            repeat(maxX - minX) { colIdx ->
+                if (Point(colIdx+1 + minX, rowIdx+1).andLog() in rocks) {
+                    row.add(ROCK)
+                } else row.add(AIR)
+            }
+            cave.add(row)
+        }
+        cave.prettyPrint()
+
+
+
+
 
         TODO("Not yet implemented")
     }
