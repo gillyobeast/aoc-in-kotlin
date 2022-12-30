@@ -6,7 +6,7 @@ fun <E> Matrix<E>.prettyPrint() {
     println(map { it.joinToString(" ") }.joinToString("\n"))
 }
 
-fun <E> Matrix<E>.prettyPrint(path: MutableList<Pair<Int, Int>>) {
+fun <E> Matrix<E>.prettyPrint(path: List<Pair<Int, Int>>) {
     println(mapIndexed { rowIndex, row ->
         row.mapIndexed { colIndex, value ->
             (if (path.contains(rowIndex to colIndex)) ">" else " ") + value.toString()
