@@ -14,6 +14,10 @@ class IntNode(val value: Int) : Node {
             is ArrayNode -> ArrayNode(listOf(this)).compareTo(other)
 
         }
+
+    override fun toString(): String {
+        return value.toString()
+    }
 }
 
 class ArrayNode(var nodes: List<Node> = listOf()) : Node {
@@ -34,6 +38,10 @@ class ArrayNode(var nodes: List<Node> = listOf()) : Node {
 
     operator fun plus(node: Node) {
         nodes += node
+    }
+
+    override fun toString(): String {
+        return nodes.joinToString(",", prefix = "[", postfix = "]")
     }
 
 }
@@ -72,14 +80,19 @@ object Day13new : Puzzle(2022, 13) {
 
     private fun Pair<Node, Node>.isCorrectOrder(): Boolean {
         this.andLog()
-        return false
+        return true
     }
 
     private fun String.parse(): Node {
         val array = ArrayNode()
         val stack = mutableListOf(array)
-        map { it: Char ->
-            when (it) {
+        var skip = 0
+        for (idx in this.indices) {
+            if (skip > 0){
+                skip--
+                continue
+            }
+            when (val it = this[idx]) {
                 '[' -> {
                     val newArray = ArrayNode()
                     array + newArray
@@ -87,12 +100,20 @@ object Day13new : Puzzle(2022, 13) {
                 }
 
                 ']' -> stack.removeFirst()
+                ',' -> skip++
                 else -> {
-                    stack[0] + IntNode(it.digitToInt())
+                    val ints = mutableListOf<Char>()
+                    var searchIdx = idx
+                    do{
+                        ints.add(this[searchIdx++])
+                        skip++
+                    } while (!listOf(',','[',']').contains(this[searchIdx]))
+
+                    stack[0] + IntNode(ints.joinToString("").toInt())
                 }
             }
         }
-        return array
+        return array.nodes[0]
     }
 
     override fun part2(input: List<String>): Any {
