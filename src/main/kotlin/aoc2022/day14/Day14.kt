@@ -41,9 +41,9 @@ object Day14 : Puzzle(2022, 14) {
                 }
             }
 
-        println("minX = ${minX}")
-        println("maxX = ${maxX}")
-        println("maxY = ${maxY}")
+        println("minX = $minX")
+        println("maxX = $maxX")
+        println("maxY = $maxY")
 
         val cave: MutableList<MutableList<Char>> = mutableListOf()
         // rows then columns
@@ -58,17 +58,37 @@ object Day14 : Puzzle(2022, 14) {
         }
         cave.prettyPrint()
 
-
+        val rocksAndSand = rocks.toMutableSet()
         untilFalse {
             // in this loop, one unit of sand is moved through the cave.
+            var sand = Point(500, 0)
+            var count = 0
+            while (count++ < maxY) {
+                var nextPoint = sand.copy(y = sand.y + 1)
+                if (nextPoint !in rocksAndSand) {
+                    sand = nextPoint
+                    continue
+                }
+                nextPoint = nextPoint.copy(x = nextPoint.x - 1)
+                if (nextPoint in rocksAndSand) {
+                    sand = nextPoint
+                    continue
+                }
+                nextPoint = nextPoint.copy(x = nextPoint.x + 2)
+                if (nextPoint !in rocksAndSand) {
+                    sand = nextPoint
+                    continue
+                }
+                rocksAndSand.add(sand)
+                break
+            }
 
-
-            true
+            return@untilFalse sand.y <= maxY
         }
 
-
-
-        return 0
+        println("-".repeat((maxX - minX) * 2 - 1))
+        cave.prettyPrint()
+        return rocksAndSand.minus(rocks).size
     }
 
     private fun untilFalse(limit: Int = 10_000, block: (Int) -> Boolean) {
