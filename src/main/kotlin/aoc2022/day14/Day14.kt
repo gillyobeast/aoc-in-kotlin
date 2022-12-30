@@ -4,7 +4,15 @@ import aoc2022.Puzzle
 import aoc2022.utils.andLog
 import kotlin.reflect.KProperty1
 
-data class Point(val x: Int, val y: Int)
+const val ROCK = '#'
+const val AIR = '.'
+const val SAND = 'o'
+
+data class Point(val x: Int, val y: Int) {
+    override fun toString(): String {
+        return "($x,$y)"
+    }
+}
 
 fun List<Int>.toPoint(): Point {
     check(this.size == 2) { "Can only make a pair out of two values" }
@@ -18,9 +26,9 @@ fun Pair<Int, Int>.toPoint(): Point {
 object Day14 : Puzzle(2022, 14) {
     override fun part1(input: List<String>): Any {
         val rocks = mutableSetOf<Point>()
-        var minY = 500
-        val updateMinY = { it: Int -> minY = if (it < minY) it else minY }
-        var (minX, maxX) = 0 to 0
+        var maxY = 0
+        val updateMinY = { it: Int -> if (maxY < it) maxY = it }
+        var (minX, maxX) = 500 to 500
         val updateXRange = { it: Int -> if (it < minX) minX = it; if (maxX < it) maxX = it }
         input.parsePoints().andLog()
             .forEach { points ->
@@ -32,6 +40,10 @@ object Day14 : Puzzle(2022, 14) {
                     }
                 }
             }
+
+        println("minX = ${minX}")
+        println("maxX = ${maxX}")
+        println("maxY = ${maxY}")
 
         println(rocks)
 
