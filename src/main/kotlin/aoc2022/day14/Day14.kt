@@ -15,8 +15,7 @@ object Day14 : Puzzle(2022, 14) {
         val updateXRange = { it: Int -> if (it < minX) minX = it; if (maxX < it) maxX = it }
         input.parsePoints().andLog()
             .forEach { points ->
-                for ((index, from) in points.dropLast(1).withIndex()) {
-                    val to = points[index + 1]
+                points.windowed(2) { (from, to) ->
                     for (point in pointsBetween(from, to)) {
                         rocks.add(point)
                         updateMinY(point.second)
