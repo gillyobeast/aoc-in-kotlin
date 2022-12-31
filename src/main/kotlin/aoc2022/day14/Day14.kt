@@ -11,7 +11,7 @@ const val SAND = 'x'
 fun <E> Matrix<E>.prettyPrint(path: List<Point>, minX: Int) {
     println(mapIndexed { rowIndex, row ->
         row.mapIndexed { colIndex, value ->
-            (if (path.contains(Point(rowIndex, colIndex + minX))) ">" else " ") + value.toString()
+            (if (path.contains(Point(colIndex + minX, rowIndex))) ">" else " ") + value.toString()
         }.joinToString("")
     }.joinToString("\n"))
 }
