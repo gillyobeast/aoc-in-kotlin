@@ -2,7 +2,9 @@ package aoc2022.day14
 
 import aoc2022.Puzzle
 import aoc2022.utils.Matrix
+import aoc2022.utils.Point
 import aoc2022.utils.shouldNotBe
+import aoc2022.utils.toPoint
 import kotlin.reflect.KProperty1
 
 const val ROCK = '#'
@@ -17,20 +19,6 @@ fun <E> Matrix<E>.prettyPrint(path: List<Point>, minX: Int) {
     }.joinToString("\n"))
 }
 
-data class Point(val x: Int, val y: Int) {
-    override fun toString(): String {
-        return "($x,$y)"
-    }
-}
-
-fun List<Int>.toPoint(): Point {
-    check(this.size == 2) { "Can only make a pair out of two values" }
-    return Point(this[0], this[1])
-}
-
-fun Pair<Int, Int>.toPoint(): Point {
-    return Point(first, second)
-}
 
 private val rockOrSand = setOf(ROCK, SAND)
 

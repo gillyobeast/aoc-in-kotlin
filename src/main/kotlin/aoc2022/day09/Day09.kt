@@ -1,13 +1,14 @@
 package aoc2022.day09
 
-import aoc2022.utils.Point
-import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
 import aoc2022.utils.readTestInput
 import kotlin.math.abs
 import kotlin.math.sign
 
-enum class Move(val regex: Regex, val applyTo: (Point) -> Point) {
+enum class Move(
+    val regex: Regex,
+    val applyTo: (Pair<Int, Int>) -> Pair<Int, Int>
+) {
     UP("U \\d+".toRegex(), { it.first to it.second + 1 }),
     DOWN("D \\d+".toRegex(), { it.first to it.second - 1 }),
     LEFT("L \\d+".toRegex(), { it.first - 1 to it.second }),
@@ -57,7 +58,7 @@ fun part2(input: List<String>): Int {
 //    println(moves)
 
 // head, 1, 2, 3, 4, 5, 6, 7, 8, 9
-    val knots = mutableListOf<Point>()
+    val knots = mutableListOf<Pair<Int, Int>>()
 
     repeat(10) { knots.add(0 to 0) }
     val tailVisitedPositions = mutableSetOf(knots[9])
@@ -84,7 +85,7 @@ fun part2(input: List<String>): Int {
     return tailVisitedPositions.size
 }
 
-private fun Point.moveToward(other: Point): Point {
+private fun Pair<Int, Int>.moveToward(other: Pair<Int, Int>): Pair<Int, Int> {
     this.log("start ")
     other.log(", towards ")
     return if (this.isWithin1Of(other)) this
@@ -96,7 +97,7 @@ private fun Point.moveToward(other: Point): Point {
 private fun Int.moveToward(first1: Int) = this + (first1 - this).sign
 
 
-private fun Point.isWithin1Of(headPosition: Point): Boolean {
+private fun Pair<Int, Int>.isWithin1Of(headPosition: Pair<Int, Int>): Boolean {
     return abs(first - headPosition.first).log(", x ") <= 1 && abs(second - headPosition.second).log(
         ", y "
     ) <= 1

@@ -39,5 +39,20 @@ infix fun <T> T.shouldNotBe(equalTo: T): T {
 }
 
 typealias Point2D<E> = Pair<E, E>
-typealias Point = Point2D<Int>
 
+
+
+data class Point(val x: Int, val y: Int) {
+    override fun toString(): String {
+        return "($x,$y)"
+    }
+}
+
+fun List<Int>.toPoint(): Point {
+    check(this.size == 2) { "Can only make a pair out of two values" }
+    return Point(this[0], this[1])
+}
+
+fun Pair<Int, Int>.toPoint(): Point {
+    return Point(first, second)
+}
