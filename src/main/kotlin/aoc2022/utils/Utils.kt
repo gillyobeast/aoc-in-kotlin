@@ -47,6 +47,9 @@ data class Point(val x: Int, val y: Int) {
         return "($x,$y)"
     }
 }
+infix fun Int.by(other: Int): Point {
+    return Point(this, other)
+}
 
 fun List<Int>.toPoint(): Point {
     check(this.size == 2) { "Can only make a pair out of two values" }
