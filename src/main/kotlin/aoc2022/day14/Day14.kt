@@ -2,6 +2,7 @@ package aoc2022.day14
 
 import aoc2022.Puzzle
 import aoc2022.utils.Matrix
+import aoc2022.utils.shouldNotBe
 import kotlin.reflect.KProperty1
 
 const val ROCK = '#'
@@ -51,60 +52,56 @@ object Day14 : Puzzle(2022, 14) {
             cave.add(row)
         }
 //        cave.prettyPrint()
-        try {
-            var sands = 0
-            outer@while (sands++ < 10_000) {
-                // in this loop, one unit of sand is moved through the cave.
-                var sand = Point(499, 0)
-                val path = mutableListOf(sand)
-                var moves = 0
-                while (moves++ < maxY) {
-                    // in this loop, the unit of sand moves down one unit if it can,
-                    //  moving diagonally as necessary
-                    var xCandidate = sand.x
-                    val yCandidate = sand.y + 1
-                    if (yCandidate >= maxY){
-                        break@outer
-                    }
-                    // try below
-                    val row = cave[yCandidate]
-                    if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
-                        // if not blocked
-                        sand = Point(xCandidate, yCandidate)
-                        path.add(sand)
-                        continue
-                    }
-                    // try diagonally left
-                    xCandidate = sand.x - 1
-                    if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
-                        sand = Point(xCandidate, yCandidate)
-                        path.add(sand)
-                        continue
-                    }
-                    // try diagonally right
-                    xCandidate = sand.x + 1
-                    if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
-                        sand = Point(xCandidate, yCandidate)
-                        path.add(sand)
-                        continue
-                    }
-
-                    cave[yCandidate - 1][sand.x - minX] = SAND
-                    break
+        var sands = 0
+        outer@ while (sands++ < 10_000) {
+            // in this loop, one unit of sand is moved through the cave.
+            var sand = Point(499, 0)
+            val path = mutableListOf(sand)
+            var moves = 0
+            while (moves++ < maxY) {
+                // in this loop, the unit of sand moves down one unit if it can,
+                //  moving diagonally as necessary
+                var xCandidate = sand.x
+                val yCandidate = sand.y + 1
+                if (yCandidate >= maxY) {
+                    // we're done
+                    break@outer
                 }
-                println("-".repeat((maxX - minX) * 2 - 1))
-                cave.prettyPrint(path, minX)
-                if (sand.y > maxY)
-                    break
+                // try below
+                val row = cave[yCandidate]
+                if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
+                    // if not blocked
+                    sand = Point(xCandidate, yCandidate)
+                    path.add(sand)
+                    continue
+                }
+                // try diagonally left
+                xCandidate = sand.x - 1
+                if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
+                    sand = Point(xCandidate, yCandidate)
+                    path.add(sand)
+                    continue
+                }
+                // try diagonally right
+                xCandidate = sand.x + 1
+                if (row.getOrNull(xCandidate - minX) !in rockOrSand) {
+                    sand = Point(xCandidate, yCandidate)
+                    path.add(sand)
+                    continue
+                }
+
+                cave[yCandidate - 1][sand.x - minX] = SAND
+                break
             }
-        } catch (e: IndexOutOfBoundsException) {
-            // consume - means we fell out of the cave
-            println(e)
+//            println("-".repeat((maxX - minX) * 2 - 1))
+//            cave.prettyPrint(path, minX)
+            if (sand.y > maxY)
+                break
         }
 
-//        println("-".repeat((maxX - minX) * 2 - 1))
-//        cave.prettyPrint()
-        return cave.sumOf { row -> row.count { it == SAND } } +1
+        println("-".repeat((maxX - minX) * 2 - 1))
+        cave.prettyPrint(mutableListOf(), minX)
+        return cave.sumOf { row -> row.count { it == SAND } } shouldNotBe 127 shouldNotBe 863
     }
 
     private fun extracted(input: List<String>): Pair<Pair<Int, Int>, Pair<Int, MutableSet<Point>>> {
@@ -127,7 +124,7 @@ object Day14 : Puzzle(2022, 14) {
 //        println("minX = $minX")
 //        println("maxX = $maxX")
 //        println("maxY = $maxY")
-        return (minX to maxX) to (maxY to rocks)
+        return (minX - 1 to maxX) to (maxY to rocks)
     }
 
     private fun pointsBetween(from: Point, to: Point): Set<Point> {
