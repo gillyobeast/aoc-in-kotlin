@@ -32,9 +32,10 @@ data class Sensor(val position: Point, val beacon: Point) {
     }
 
     fun getDiscTouchingBeacon(plusRadius: Int = 0): Set<Point> {
-        return (position.y - taxicabDistance..position.y + taxicabDistance)
+        val radius = plusRadius + taxicabDistance
+        return (position.y - radius..position.y + radius)
             .flatMap { y ->
-                val i = taxicabDistance + plusRadius - abs(y - position.y)
+                val i = radius - abs(y - position.y)
                 setOf(position.x - i, position.x + i).map { x ->
                     x by y
                 }.toSet()
@@ -92,17 +93,32 @@ object Day15 : Puzzle(2022, 15) {
         val limit = if (input.size < 20) 20 else 4_000_000
         val withinLimit: (Point) -> Boolean = { it.x in 0..limit && it.y in 0..limit }
 
-        val searchSpace = sensors.flatMapToSet { it.getDiscTouchingBeacon(plusRadius = 1) }
+        val searchSpace = sensors.flatMap { it.getDiscTouchingBeacon(plusRadius = 1) }
+            .toSet()
             // get all within the bounds
             .filterToSet(withinLimit)
-            .andLog("search space size = ") { it.size }
 
         // then search that set of points to see if they are in the radius
-        val unionOfDisks = sensors.flatMapToSet { it.getDiscTouchingBeacon() }
-            .filterToSet(withinLimit)
-        return searchSpace.minus(unionOfDisks)
-            .single()
-            .tuningFrequency()
+        for (y in searchSpace.sortedBy { it.y }.map { it.y }.toSet()) {
+            val unionOfDisks = sensors.flatMapToSet { it.getBallTouchingBeacon(y) }
+                .filterToSet(withinLimit)
+
+            val candidates = searchSpace
+                .minus(unionOfDisks)
+                .filterToSet { it.y == y }
+
+            if (candidates.isEmpty()) {
+                continue
+            } else if (candidates
+                    .also { draw(it) }
+                    .size == 1
+            ) {
+                return candidates.toList()[0].tuningFrequency()
+            } else {
+                error("${candidates.size} found!")
+            }
+        }
+        error("No point found!")
     }
 
     private fun <S, E> Set<S>.flatMapToSet(mapping: (S) -> Iterable<E>) =
