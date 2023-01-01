@@ -64,7 +64,7 @@ object Day15 : Puzzle(2022, 15) {
             draw(points, sensors)
 
             val beacons = sensors.beacons
-            return points.count { it !in beacons }
+            return points.count { it.x == 10 && it !in beacons }
         } else {
             val targetY = 2_000_000
 
@@ -83,7 +83,21 @@ object Day15 : Puzzle(2022, 15) {
     }
 
     override fun part2(input: List<String>): Any {
-        TODO("Not yet implemented")
+        fun Point.tuningFrequency(): Int = x * 4_000_000 + y
+        val sensors = parseSensors(input)
+        val beacons = sensors.beacons
+        val limit = if (input.size < 20) 20 else 4_000_000
+
+        for (row in 0..limit) {
+            val points = sensors.flatMap { it.getPointsCloserThanBeacon(row.andLog()) }
+            for (col in 0..limit) {
+                val point = col by row
+                if (point !in points && point !in beacons) {
+                    return point.tuningFrequency()
+                }
+            }
+        }
+        error("No point found")
     }
 }
 
