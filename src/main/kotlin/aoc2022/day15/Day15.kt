@@ -52,10 +52,10 @@ object Day15 : Puzzle(2022, 15) {
         val targetY = if (input.size < 20) 10 else 2_000_000
 
         val sensors = parseSensors(input)
-        val points: Set<Point> = sensors.andLog { it.joinToString("\n") }
+        val points: Set<Point> = sensors//.andLog { it.joinToString("\n") }
             .flatMap { it.getPointsCloserThanBeacon(targetY) }
             .toSet()
-            .andLog{it.joinToString(limit = 100)}
+//            .andLog{it.joinToString(limit = 100)}
 
 
         val beacons = sensors.beacons
@@ -93,6 +93,6 @@ object Day15 : Puzzle(2022, 15) {
 //}
 
 fun main() {
-    Day15.solve(26, -1)
+    Day15.solve(26, 56000011)
 }
 
