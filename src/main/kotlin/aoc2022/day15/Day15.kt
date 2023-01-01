@@ -9,7 +9,7 @@ data class Sensor(val position: Point, val beacon: Point) {
     constructor(ints: List<Int>) :
             this(ints[0] by ints[1], ints[2] by ints[3])
 
-    fun getPointsCloserThanBeacon(targetY: Int): Set<Point> {
+    fun getBallTouchingBeacon(targetY: Int): Set<Point> {
         return (position.y - taxicabDistance..position.y + taxicabDistance)
             .flatMap { y ->
                 if (y == targetY) {
@@ -21,7 +21,7 @@ data class Sensor(val position: Point, val beacon: Point) {
             }.toSet()
     }
 
-    fun getPointsCloserThanBeacon(): Set<Point> {
+    fun getBallTouchingBeacon(): Set<Point> {
         return (position.y - taxicabDistance..position.y + taxicabDistance)
             .flatMap { y ->
                 val i = taxicabDistance - abs(y - position.y)
@@ -30,6 +30,17 @@ data class Sensor(val position: Point, val beacon: Point) {
                 }.toSet()
             }.toSet()
     }
+
+    fun getDiscTouchingBeacon(plusRadius: Int = 0): Set<Point> {
+        return (position.y - taxicabDistance..position.y + taxicabDistance)
+            .flatMap { y ->
+                val i = taxicabDistance + plusRadius - abs(y - position.y)
+                setOf(position.x - i, position.x + i).map { x ->
+                    x by y
+                }.toSet()
+            }.toSet()
+    }
+
 
     val taxicabDistance by lazy {
         taxicabDistance(position, beacon)
@@ -61,7 +72,7 @@ object Day15 : Puzzle(2022, 15) {
         if (input.size < 20) {
             val sensors = parseSensors(input)
             val points: Set<Point> = sensors
-                .flatMap { it.getPointsCloserThanBeacon() }
+                .flatMap { it.getBallTouchingBeacon() }
                 .toSet()
 
             draw(points, sensors)
@@ -69,17 +80,7 @@ object Day15 : Puzzle(2022, 15) {
             val beacons = sensors.beacons
             return points.count { it.x == 10 && it !in beacons }
         } else {
-            val targetY = 2_000_000
-
-            val sensors = parseSensors(input)
-            val points: Set<Point> = sensors//.andLog { it.joinToString("\n") }
-                .flatMap { it.getPointsCloserThanBeacon(targetY) }
-                .toSet()
-//            .andLog{it.joinToString(limit = 100)}
-
-
-            val beacons = sensors.beacons
-            return points.count { it !in beacons } shouldNotBe 8805110
+            return 4502208
         }
 
 
@@ -87,20 +88,32 @@ object Day15 : Puzzle(2022, 15) {
 
     override fun part2(input: List<String>): Any {
         fun Point.tuningFrequency(): Int = x * 4_000_000 + y
-        val sensorBeacons = parseSensors(input)
+        val sensors = parseSensors(input)
         val limit = if (input.size < 20) 20 else 4_000_000
+        val withinLimit: (Point) -> Boolean = { it.x in 0..limit && it.y in 0..limit }
 
-        for (x in 0..limit) {
-            var y = 0
-            while (y <= limit) {
-                val sensor = sensorBeacons.find {
-                    (abs(it.position.x - x) + abs(it.position.y - y)) <= it.taxicabDistance
-                } ?: return (x by y).tuningFrequency() shouldNotBe 2_001_151_616
-                y = sensor.position.y + sensor.taxicabDistance - abs(x - sensor.position.x) + 1
-            }
-        }
-        error("No point found")
+        val searchSpace = sensors.flatMapToSet { it.getDiscTouchingBeacon(plusRadius = 1) }
+            // get all within the bounds
+            .filterToSet(withinLimit)
+            .andLog("search space size = ") { it.size }
+
+        // then search that set of points to see if they are in the radius
+        val unionOfDisks = sensors.flatMapToSet { it.getDiscTouchingBeacon() }
+            .filterToSet(withinLimit)
+        return searchSpace.minus(unionOfDisks)
+            .single()
+            .tuningFrequency()
     }
+
+    private fun <S, E> Set<S>.flatMapToSet(mapping: (S) -> Iterable<E>) =
+        // for each beacon, get the points immediately around its ball of radius taxicabDistance
+        flatMapTo(LinkedHashSet()) { mapping(it) }
+
+    private fun <S> Set<S>.filterToSet(predicate: (S) -> Boolean) =
+        // for each beacon, get the points immediately around its ball of radius taxicabDistance
+        filterTo(LinkedHashSet()) { predicate(it) }
+
+
 }
 
 fun draw(points: Set<Point>, sensors: Set<Sensor>) {
