@@ -4,6 +4,7 @@ import aoc2022.Puzzle
 import aoc2022.utils.Point
 import aoc2022.utils.andLog
 import aoc2022.utils.by
+import aoc2022.utils.shouldNotBe
 import kotlin.math.abs
 
 data class Sensor(val position: Point, val beacon: Point) {
@@ -11,16 +12,17 @@ data class Sensor(val position: Point, val beacon: Point) {
     constructor(ints: List<Int>) :
             this(ints[0] by ints[1], ints[2] by ints[3])
 
-    val pointsCloserThanBeacon: Sequence<Point>
-        get() {
-            return (position.y - taxicabDistance..position.y + taxicabDistance)
-                .flatMap { y ->
+    fun getPointsCloserThanBeacon(targetY: Int): Set<Point> {
+        return (position.y - taxicabDistance..position.y + taxicabDistance)
+            .flatMap { y ->
+                if (y == targetY) {
                     val i = taxicabDistance - abs(y - position.y)
                     (position.x - i..position.x + i).map { x ->
                         x by y
-                    }
-                }.asSequence()
-        }
+                    }.toSet()
+                } else emptySet()
+            }.toSet()
+    }
 
     private val taxicabDistance by lazy {
         abs(position.x - beacon.x) + abs(position.y - beacon.y)
@@ -47,17 +49,17 @@ object Day15 : Puzzle(2022, 15) {
 
     override fun part1(input: List<String>): Any {
 
-        val sensors = parseSensors(input)
-        val points: Sequence<Point> = sensors.andLog { it.joinToString("\n") }
-            .flatMap { it.pointsCloserThanBeacon }
-
-
         val targetY = if (input.size < 20) 10 else 2_000_000
 
-//        draw(points, sensors)
+        val sensors = parseSensors(input)
+        val points: Set<Point> = sensors.andLog { it.joinToString("\n") }
+            .flatMap { it.getPointsCloserThanBeacon(targetY) }
+            .toSet()
+            .andLog{it.joinToString(limit = 100)}
+
 
         val beacons = sensors.beacons
-        return points.count { it.y == targetY && it !in beacons }
+        return points.count { it !in beacons } shouldNotBe 8805110
 
     }
 
