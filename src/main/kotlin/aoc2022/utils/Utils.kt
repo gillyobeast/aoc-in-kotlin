@@ -86,20 +86,20 @@ fun draw(points: Set<Point>) {
 
 fun StringBuilder.addHeadings(pad: Int, xRange: IntRange) {
     addHeading(pad, xRange) {
-        append(it.absoluteValue.toString().padStart(2).takeLast(2).take(1))
+        it.toString().padStart(2).takeLast(2).take(1)
     }
     addHeading(pad, xRange) {
-        append(it.absoluteValue.toString().takeLast(1))
+        it.toString().takeLast(1)
     }
 }
 
 private fun StringBuilder.addHeading(
     pad: Int,
     xRange: IntRange,
-    block: java.lang.StringBuilder.(Int) -> Unit
+    transform: (Int) -> String
 ) {
     append(" ".repeat(pad))
-    for (x in xRange) block(x)
+    for (x in xRange) append(transform(x))
     newLine()
 }
 
