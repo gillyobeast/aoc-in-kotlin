@@ -31,11 +31,14 @@ data class Sensor(val position: Point, val beacon: Point) {
             }.toSet()
     }
 
-    private val taxicabDistance by lazy {
-        abs(position.x - beacon.x) + abs(position.y - beacon.y)
+    val taxicabDistance by lazy {
+        taxicabDistance(position, beacon)
     }
 
 }
+
+private fun taxicabDistance(first: Point, second: Point) =
+    abs(first.x - second.x) + abs(first.y - second.y)
 
 private val regex =
     "Sensor at x=([^,]*), y=([^,]*): closest beacon is at x=([^,]*), y=([^,]*)".toRegex()
@@ -84,17 +87,16 @@ object Day15 : Puzzle(2022, 15) {
 
     override fun part2(input: List<String>): Any {
         fun Point.tuningFrequency(): Int = x * 4_000_000 + y
-        val sensors = parseSensors(input)
-        val beacons = sensors.beacons
+        val sensorBeacons = parseSensors(input)
         val limit = if (input.size < 20) 20 else 4_000_000
 
-        for (row in 0..limit) {
-            val points = sensors.flatMap { it.getPointsCloserThanBeacon(row.andLog()) }
-            for (col in 0..limit) {
-                val point = col by row
-                if (point !in points && point !in beacons) {
-                    return point.tuningFrequency()
-                }
+        for (x in 0..limit) {
+            var y = 0
+            while (y <= limit) {
+                val sensor = sensorBeacons.find {
+                    (abs(it.position.x - x) + abs(it.position.y - y)) <= it.taxicabDistance
+                } ?: return (x by y).tuningFrequency() shouldNotBe 2_001_151_616
+                y = sensor.position.y + sensor.taxicabDistance - abs(x - sensor.position.x) + 1
             }
         }
         error("No point found")
