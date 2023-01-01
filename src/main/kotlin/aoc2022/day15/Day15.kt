@@ -4,6 +4,7 @@ import aoc2022.Puzzle
 import aoc2022.utils.Point
 import aoc2022.utils.andLog
 import aoc2022.utils.by
+import aoc2022.utils.draw
 import kotlin.math.abs
 
 data class Sensor(val position: Point, val beacon: Point) {
@@ -53,6 +54,8 @@ object Day15 : Puzzle(2022, 15) {
 
 
         val targetY = if (input.size < 20) 10 else 2_000_000
+
+        draw(points)
 
         return points.sortedBy { it.y }.count { it.y == targetY }
 

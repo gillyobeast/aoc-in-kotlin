@@ -41,12 +41,12 @@ infix fun <T> T.shouldNotBe(equalTo: T): T {
 typealias Point2D<E> = Pair<E, E>
 
 
-
 data class Point(val x: Int, val y: Int) {
     override fun toString(): String {
         return "($x,$y)"
     }
 }
+
 infix fun Int.by(other: Int): Point {
     return Point(this, other)
 }
@@ -59,3 +59,21 @@ fun List<Int>.toPoint(): Point {
 fun Pair<Int, Int>.toPoint(): Point {
     return Point(first, second)
 }
+
+fun <T, R : Comparable<R>> Iterable<T>.extremaOf(selector: (T) -> R): Pair<R, R> =
+    minOf(selector) to maxOf(selector)
+
+fun draw(points: Set<Point>) {
+    val sb = StringBuilder()
+    val pad = points.maxOf { it.y.toString().length } + 1
+    for (y in rangeOf(points.extremaOf { it.y })) {
+        sb.append(y.toString().padEnd(pad))
+        for (x in rangeOf(points.extremaOf { it.x })) {
+            sb.append(if (x by y in points) '#' else '.')
+        }
+        sb.append('\n')
+    }
+    println(sb)
+}
+
+private fun rangeOf(extrema: Pair<Int, Int>) = extrema.first..extrema.second
