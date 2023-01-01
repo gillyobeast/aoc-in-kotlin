@@ -4,13 +4,30 @@ import aoc2022.Puzzle
 import aoc2022.utils.Point
 import aoc2022.utils.andLog
 import aoc2022.utils.by
+import kotlin.math.abs
 
 data class Sensor(val position: Point, val beacon: Point) {
-    constructor(x: Int, y: Int, beaconX: Int, beaconY: Int) :
-            this(x by y, beaconX by beaconY)
 
     constructor(ints: List<Int>) :
-            this(ints[0], ints[1], ints[2], ints[3])
+            this(ints[0] by ints[1], ints[2] by ints[3])
+
+    val pointsCloserThanBeacon: Set<Point>
+        get() {
+            val points = mutableSetOf<Point>()
+
+            for (y in position.y - taxicabDistance..position.y + taxicabDistance) { // rows
+                val i = taxicabDistance + (y - position.y)
+                for (x in position.x - i..position.x + i) {
+                    points.add(Point(position.x + x, position.y + y))
+                }
+            }
+
+            return points
+        }
+
+    private val taxicabDistance by lazy {
+        abs(position.x - beacon.x + position.y - beacon.y)
+    }
 
 }
 
@@ -30,12 +47,15 @@ object Day15 : Puzzle(2022, 15) {
 
     override fun part1(input: List<String>): Any {
 
-        val sensors: Set<Sensor> = parseSensors(input)
+        val points: Set<Point> = parseSensors(input)
             .andLog()
+            .flatMapTo(mutableSetOf()) { it.pointsCloserThanBeacon }
 
 
+        val targetY = if (input.size < 20) 10 else 2_000_000
 
-        TODO("Not yet implemented")
+        return points.sortedBy { it.y }.count { it.y == targetY }
+
     }
 
     override fun part2(input: List<String>): Any {
