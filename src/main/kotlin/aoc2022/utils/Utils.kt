@@ -19,6 +19,10 @@ fun <E> E.andLog(extra: Any = ""): E {
     return also { println(extra.toString() + this) }
 }
 
+fun <E> E.andLog(extra: Any = "", block: (E) -> Any): E {
+    return also { println(extra.toString() + block(this)) }
+}
+
 fun <E> List<E>.toPoint(): Point2D<E> {
     check(this.size == 2) { "Can only make a pair out of two values" }
     return this[0] to this[1]
@@ -80,7 +84,7 @@ fun draw(points: Set<Point>) {
     println(sb)
 }
 
-private fun StringBuilder.addHeadings(pad: Int, xRange: IntRange) {
+fun StringBuilder.addHeadings(pad: Int, xRange: IntRange) {
     addHeading(pad, xRange) {
         append(it.absoluteValue.toString().padStart(2).takeLast(2).take(1))
     }
@@ -99,7 +103,7 @@ private fun StringBuilder.addHeading(
     newLine()
 }
 
-private fun StringBuilder.newLine() {
+fun StringBuilder.newLine() {
     append('\n')
 }
 

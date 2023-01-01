@@ -1,10 +1,7 @@
 package aoc2022.day15
 
 import aoc2022.Puzzle
-import aoc2022.utils.Point
-import aoc2022.utils.andLog
-import aoc2022.utils.by
-import aoc2022.utils.draw
+import aoc2022.utils.*
 import kotlin.math.abs
 
 data class Sensor(val position: Point, val beacon: Point) {
@@ -16,10 +13,10 @@ data class Sensor(val position: Point, val beacon: Point) {
         get() {
             val points = mutableSetOf<Point>()
 
-            for (y in position.y - taxicabDistance..position.y + taxicabDistance) { // rows
-                val i = taxicabDistance + (y - position.y)
+            for (y in position.y - taxicabDistance..position.y + taxicabDistance) {
+                val i = taxicabDistance - abs(y - position.y)
                 for (x in position.x - i..position.x + i) {
-                    points.add(Point(position.x + x, position.y + y))
+                    points.add(x by y)
                 }
             }
 
@@ -27,7 +24,7 @@ data class Sensor(val position: Point, val beacon: Point) {
         }
 
     private val taxicabDistance by lazy {
-        abs(position.x - beacon.x + position.y - beacon.y)
+        abs(position.x - beacon.x) + abs(position.y - beacon.y)
     }
 
 }
@@ -48,16 +45,16 @@ object Day15 : Puzzle(2022, 15) {
 
     override fun part1(input: List<String>): Any {
 
-        val points: Set<Point> = parseSensors(input)
-            .andLog()
+        val sensors = parseSensors(input)
+        val points: Set<Point> = sensors.andLog { it.joinToString("\n") }
             .flatMapTo(mutableSetOf()) { it.pointsCloserThanBeacon }
 
 
         val targetY = if (input.size < 20) 10 else 2_000_000
 
-        draw(points)
+        draw(points, sensors)
 
-        return points.sortedBy { it.y }.count { it.y == targetY }
+        return points.count { it.y == targetY }
 
     }
 
@@ -65,6 +62,30 @@ object Day15 : Puzzle(2022, 15) {
         TODO("Not yet implemented")
     }
 
+}
+
+fun draw(points: Set<Point>, sensors: Set<Sensor>) {
+    val sensorPoints = sensors.map { it.position }.toSet()
+    val beacons = sensors.map { it.beacon }.toSet()
+        val sb = StringBuilder()
+        val pad = points.maxOf { it.y.toString().length } + 1
+        val (xMin, xMax) = points.extremaOf { it.x }
+        val xRange = xMin..xMax
+        sb.addHeadings(pad, xRange)
+        for (y in points.minOf { it.y }..points.maxOf { it.y }) {
+            sb.append(y.toString().padEnd(pad))
+            for (x in xRange) {
+            val c = when (x by y) {
+                in sensorPoints -> 'S'
+                in beacons -> 'B'
+                in points -> '#'
+                else -> '.'
+            }
+            sb.append(c)
+        }
+        sb.newLine()
+    }
+    println(sb)
 }
 
 fun main() {
