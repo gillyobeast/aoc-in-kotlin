@@ -3,6 +3,7 @@ package aoc2022.utils
 import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.math.absoluteValue
 
 fun readInput() = readFile("input.txt")
 fun readTestInput() = readFile("test_input.txt")
@@ -66,14 +67,39 @@ fun <T, R : Comparable<R>> Iterable<T>.extremaOf(selector: (T) -> R): Pair<R, R>
 fun draw(points: Set<Point>) {
     val sb = StringBuilder()
     val pad = points.maxOf { it.y.toString().length } + 1
-    for (y in rangeOf(points.extremaOf { it.y })) {
+    val (xMin, xMax) = points.extremaOf { it.x }
+    val xRange = xMin..xMax
+    sb.addHeadings(pad, xRange)
+    for (y in points.minOf { it.y }..points.maxOf { it.y }) {
         sb.append(y.toString().padEnd(pad))
-        for (x in rangeOf(points.extremaOf { it.x })) {
+        for (x in xRange) {
             sb.append(if (x by y in points) '#' else '.')
         }
-        sb.append('\n')
+        sb.newLine()
     }
     println(sb)
 }
 
-private fun rangeOf(extrema: Pair<Int, Int>) = extrema.first..extrema.second
+private fun StringBuilder.addHeadings(pad: Int, xRange: IntRange) {
+    addHeading(pad, xRange) {
+        append(it.absoluteValue.toString().padStart(2).takeLast(2).take(1))
+    }
+    addHeading(pad, xRange) {
+        append(it.absoluteValue.toString().takeLast(1))
+    }
+}
+
+private fun StringBuilder.addHeading(
+    pad: Int,
+    xRange: IntRange,
+    block: java.lang.StringBuilder.(Int) -> Unit
+) {
+    append(" ".repeat(pad))
+    for (x in xRange) block(x)
+    newLine()
+}
+
+private fun StringBuilder.newLine() {
+    append('\n')
+}
+
