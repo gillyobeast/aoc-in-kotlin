@@ -25,15 +25,11 @@ data class Sensor(val position: Point, val beacon: Point) {
             }.toSet()
     }
 
-    fun getBallTouchingBeacon(inRow: Int, plusRadius: Int = 0): Set<Point> {
+    fun getInterval(inRow: Int, plusRadius: Int = 0): Pair<Int, Int> {
         val radius = plusRadius + taxicabDistance
-        return (position.y - radius..position.y + radius)
-            .flatMap { y ->
-                val i = radius - abs(y - position.y)
-                setOf(position.x - i, position.x + i).map { x ->
-                    x by y
-                }.toSet()
-            }.toSet()
+        val i = abs(radius - abs(inRow - position.y))
+        return position.x - i to position.x + i
+
     }
 
 
@@ -98,33 +94,40 @@ object Day15 : Puzzle(2022, 15) {
         fun Point.tuningFrequency(): Int = x * 4_000_000 + y
         val sensors = parseSensors(input)
         val limit = if (input.size < 20) 20 else 4_000_000
-        val withinLimit: (Point) -> Boolean = { it.x in 0..limit }
 
+        val candidates = mutableSetOf<Point>()
         for (y in 0..limit) {
-            val searchSpace =
-                sensors.flatMapToSet { it.getBallTouchingBeacon(plusRadius = 1, inRow = y) }
-                    // get all within the bounds
-                    .filterToSet(withinLimit)
-            val unionOfDisks = sensors.flatMapToSet { it.getSphereTouchingBeacon(y) }
-                .filterToSet(withinLimit)
+            sensors.mapToSet { it.getInterval(plusRadius = 1, inRow = y) }
+                .sortedBy { it.first }
+                .fold(0 to 0) { interval, next ->
+                    // case analysis:
+                    // if interval ends before next starts, return interval
+                    if (interval.second < next.first) interval
+                    // else if interval starts before next starts:
+                    else if (interval.second > next.second) interval
+                    //     if interval ends after next ends, return interval
+                    //     else return interval.start .. next.end
+                    else 0 to next.second
 
-            val candidates = searchSpace
-                .minus(unionOfDisks)
-                .filterToSet { it.y == y }
 
-            if (candidates.isEmpty()) {
-                continue
-            } else if (candidates
-                    .also { draw(it) }
-                    .size == 1
-            ) {
-                return candidates.toList()[0].tuningFrequency()
-            } else {
-                error("${candidates.size} found!")
-            }
+                }.let {
+                    if (it.second < limit)
+                        candidates.add(it.second by y)
+                }
+
+
+        }
+        if (candidates.size > 1) {
+            error("${candidates.size} found!")
+        } else if (candidates.size == 1) {
+            return candidates.toList()[0].tuningFrequency()
         }
         error("No point found!")
     }
+
+
+    private inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> =
+        mapTo(LinkedHashSet(), transform)
 
     private inline fun <T, R> Iterable<T>.flatMapToSet(transform: (T) -> Iterable<R>): Set<R> =
         flatMapTo(LinkedHashSet(), transform)
