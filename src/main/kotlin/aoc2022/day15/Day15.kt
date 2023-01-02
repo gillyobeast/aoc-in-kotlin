@@ -87,34 +87,39 @@ object Day15 : Puzzle(2022, 15) {
     }
 
     override fun part2(input: List<String>): Any {
-        fun Point.tuningFrequency(): Int = x * 4_000_000 + y
         val sensors = parseSensors(input)
         val limits = 0..if (input.size < 20) 20 else 4_000_000
 
+        val candidates = mutableSetOf<Point>()
         for (y in limits) {
-//            println("=== $y ===")
             sensors.mapToSet {
                 it.getInterval(y)
             }.filterNotNull().sortedBy { it.first }
                 .fold(mutableListOf<IntRange>()) { intervals, interval ->
                     intervals.mergeIn(interval, limits)
-                }.let {
-                    if (it.size >= 2) {
-                        val x = it.first().last + 1
-                        return (x by y).tuningFrequency()
+                }.let { ranges ->
+                    if (ranges.size >= 2) {
+                        val x = ranges[0].last + 1
+                        candidates.add((x by y).andLog { "$it - $ranges" })
                     }
                 }
 
         }
 
-        error("none found")
+        fun Point.tuningFrequency(): Int = x * 4_000_000 + y
+
+        when (candidates.size) {
+            1 -> return candidates.toList()[0].tuningFrequency() shouldNotBe 2001151616
+            else -> error("${candidates.size} found: $candidates")
+        }
+
     }
 
 
 }
 
 private infix fun IntRange.intersects(other: IntRange): Boolean {
-    return !(this.first < other.last && this.last < other.first)
+    return !(this.first < other.last + 1 && this.last + 1 < other.first)
 }
 
 private infix fun IntRange.union(
