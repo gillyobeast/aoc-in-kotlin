@@ -28,6 +28,12 @@ data class Sensor(val position: Point, val beacon: Point) {
 
     }
 
+    fun getSphereTouchingBeacon(inRow: Int): Set<Point> {
+        val i = taxicabDistance - abs(inRow - position.y)
+        return (position.x - i..position.x + i).map { x -> x by inRow }.toSet()
+
+    }
+
 
     private val taxicabDistance by lazy {
         taxicabDistance(position, beacon)
@@ -67,20 +73,20 @@ object Day15 : Puzzle(2022, 15) {
             val beacons = sensors.beacons
             return points.count { it.x == 10 && it !in beacons }.toLong()
         } else {
-//
-//            val targetY = 2_000_000
-//
-//            val sensors = parseSensors(input)
-//            val points: Set<Point> = sensors//.andLog { it.joinToString("\n") }
-//                .flatMap { it.getPointsCloserThanBeacon(targetY) }
-//                .toSet()
-////            .andLog{it.joinToString(limit = 100)}
-//
-//
-//            val beacons = sensors.beacons
-//            return points.count { it !in beacons } shouldNotBe 8805110
-//
-            return 4502208L
+
+            val targetY = 2_000_000
+
+            val sensors = parseSensors(input)
+            val points: Set<Point> = sensors//.andLog { it.joinToString("\n") }
+                .flatMap { it.getSphereTouchingBeacon(targetY) }
+                .toSet()
+//            .andLog{it.joinToString(limit = 100)}
+
+
+            val beacons = sensors.beacons
+            return points.count { it !in beacons }.toLong() shouldNotBe 8805110L
+
+//            return 4502208L
         }
 
 
