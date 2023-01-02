@@ -71,7 +71,7 @@ object Day15 : Puzzle(2022, 15) {
             draw(points, sensors)
 
             val beacons = sensors.beacons
-            return points.count { it.x == 10 && it !in beacons }.toLong()
+            return points.count { it.x == 10 && it !in beacons }
         } else {
 
             val targetY = 2_000_000
@@ -84,9 +84,9 @@ object Day15 : Puzzle(2022, 15) {
 
 
             val beacons = sensors.beacons
-            return points.count { it !in beacons }.toLong() shouldNotBe 8805110L
+            return points.count { it !in beacons } shouldNotBe 8805110
 
-//            return 4502208L
+//            return 4502208
         }
 
 
@@ -172,6 +172,6 @@ fun draw(points: Set<Point>, sensors: Set<Sensor>) {
 }
 
 fun main() {
-    Day15.solve(26L, 56000011L)
+    Day15.solve(26, 56000011L)
 }
 

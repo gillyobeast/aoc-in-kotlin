@@ -9,7 +9,7 @@ import kotlin.system.measureTimeMillis
 abstract class Puzzle(private val year: Int, private val day: Int) {
     abstract fun part1(input: List<String>): Any
     abstract fun part2(input: List<String>): Any
-    open fun <T> solve(part1TestResult: T, part2TestResult: T) {
+    open fun <T, S> solve(part1TestResult: T, part2TestResult: S) {
         val testInput = readTestInput()
         val input = readInput()
 

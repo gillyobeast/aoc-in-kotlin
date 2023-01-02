@@ -1,7 +1,6 @@
 package aoc2022.day10
 
 import aoc2022.Puzzle
-import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
 import aoc2022.utils.readTestInput
 
@@ -62,7 +61,7 @@ object Day10 : Puzzle(2022, 10) {
     }
 
 
-    override fun <T> solve(part1TestResult: T, part2TestResult: T) {
+    override fun <T, S> solve(part1TestResult: T, part2TestResult: S) {
 
         val testInput = readTestInput()
         val input = readInput()
