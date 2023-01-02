@@ -65,7 +65,7 @@ object Day15 : Puzzle(2022, 15) {
             draw(points, sensors)
 
             val beacons = sensors.beacons
-            return points.count { it.x == 10 && it !in beacons }
+            return points.count { it.x == 10 && it !in beacons }.toLong()
         } else {
 //
 //            val targetY = 2_000_000
@@ -80,7 +80,7 @@ object Day15 : Puzzle(2022, 15) {
 //            val beacons = sensors.beacons
 //            return points.count { it !in beacons } shouldNotBe 8805110
 //
-            return 4502208
+            return 4502208L
         }
 
 
@@ -106,12 +106,12 @@ object Day15 : Puzzle(2022, 15) {
 
         }
 
-        fun Point.tuningFrequency(): Int = x * 4_000_000 + y
+        fun Point.tuningFrequency() = x * 4_000_000L + y
 
-        when (candidates.size) {
-            1 -> return candidates.toList()[0].tuningFrequency() shouldNotBe 2001151616
+        return when (candidates.size) {
+            1 -> candidates.toList()[0].tuningFrequency()
             else -> error("${candidates.size} found: $candidates")
-        }
+        } shouldNotBe 2_001_151_616L
 
     }
 
@@ -166,6 +166,6 @@ fun draw(points: Set<Point>, sensors: Set<Sensor>) {
 }
 
 fun main() {
-    Day15.solve(26, 56000011)
+    Day15.solve(26L, 56000011L)
 }
 
