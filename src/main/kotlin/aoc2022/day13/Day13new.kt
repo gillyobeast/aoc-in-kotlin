@@ -110,16 +110,6 @@ object Day13new : Puzzle(2022, 13) {
         }
     }
 
-    override fun part1(input: List<String>): Any {
-
-        val nodes = input.parseNodes()
-        return nodes
-            .associate { nodes.indexOf(it) to it.isCorrectOrder() }
-            .entries
-            .filter { it.value }
-            .sumOf { it.key + 1 }
-    }
-
     private fun Pair<Node, Node>.isCorrectOrder(): Boolean {
 
         return first <= second
@@ -149,8 +139,30 @@ object Day13new : Puzzle(2022, 13) {
 
     private infix fun <T> T.withIndex(i: Int) = IndexedValue(i, this)
 
+    override fun part1(input: List<String>): Any {
+
+        val nodes = input.parseNodes()
+        return nodes
+            .associate { nodes.indexOf(it) to it.isCorrectOrder() }
+            .entries
+            .filter { it.value }
+            .sumOf { it.key + 1 }
+    }
+
     override fun part2(input: List<String>): Any {
-        TODO("Not yet implemented")
+        val sep1 = "[[2]]".parse()
+        val sep2 = "[[6]]".parse()
+        val nodes = input.parseNodes()
+            .flatMap { setOf(it.first, it.second) }
+            .toMutableList()
+            .apply {
+                add(sep1)
+                add(sep2)
+            }.sorted()
+//        nodes.forEachIndexed { index, node -> println("${index + 1} $node") }
+
+        return (nodes.indexOf(sep1) + 1) * (nodes.indexOf(sep2) + 1)
+
     }
 
     private fun List<String>.parseNodes(): List<Pair<Node, Node>> {
@@ -167,6 +179,6 @@ object Day13new : Puzzle(2022, 13) {
 
 
 fun main() {
-    Day13new.solve(13, -1)
+    Day13new.solve(13, 140)
 }
 
