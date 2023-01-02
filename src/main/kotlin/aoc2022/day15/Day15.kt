@@ -92,12 +92,12 @@ object Day15 : Puzzle(2022, 15) {
         val limits = 0..if (input.size < 20) 20 else 4_000_000
 
         for (y in limits) {
+//            println("=== $y ===")
             sensors.mapToSet {
-                it.getInterval(y, 1)
-//                    .andLog("$y ${it.position} - ")
-            }.filterNotNull()
+                it.getInterval(y)
+            }.filterNotNull().sortedBy { it.first }
                 .fold(mutableListOf<IntRange>()) { intervals, interval ->
-                    intervals.mergeIn(interval, limits).andLog()
+                    intervals.mergeIn(interval, limits)
                 }.let {
                     if (it.size >= 2) {
                         val x = it.first().last + 1
@@ -105,18 +105,16 @@ object Day15 : Puzzle(2022, 15) {
                     }
                 }
 
-            println()
         }
 
         error("none found")
     }
 
 
-
 }
 
 private infix fun IntRange.intersects(other: IntRange): Boolean {
-    return !(this.first < other.last || this.last < other.first)
+    return !(this.first < other.last && this.last < other.first)
 }
 
 private infix fun IntRange.union(
@@ -127,7 +125,9 @@ private fun MutableList<IntRange>.mergeIn(
     interval: IntRange,
     limits: IntRange
 ): MutableList<IntRange> {
-    val element = find { it intersects interval }?.union(interval) ?: interval
+    val element =
+        find { it intersects interval }?.let { remove(it); it union interval }
+            ?: interval
     add(element restrictedTo limits)
     return this
 }
