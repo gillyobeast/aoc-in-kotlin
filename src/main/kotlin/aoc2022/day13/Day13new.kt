@@ -1,7 +1,6 @@
 package aoc2022.day13
 
 import aoc2022.Puzzle
-import aoc2022.utils.andLog
 
 sealed interface Node : Comparable<Node>
 class IntNode(val value: Int) : Node {
@@ -9,9 +8,9 @@ class IntNode(val value: Int) : Node {
     override fun compareTo(other: Node): Int =
         when (other) {
             // both ints - compare values
-            is IntNode -> value.compareTo(other.value)
+            is IntNode -> value compareTo other.value
             // first is int, second is array. wrap first in array and try again.
-            is ArrayNode -> ArrayNode(listOf(this)).compareTo(other)
+            is ArrayNode -> ArrayNode(listOf(this)) compareTo other
 
         }
 
@@ -21,8 +20,8 @@ class IntNode(val value: Int) : Node {
 }
 
 class ArrayNode(var nodes: List<Node> = listOf()) : Node {
-    override fun compareTo(other: Node): Int =
-        when (other) {
+    override fun compareTo(other: Node): Int {
+        return when (other) {
             // this is array, other is int. wrap other in array and try again.
             is IntNode -> this.compareTo(ArrayNode(listOf(other)))
             // both arrays - compare the first value of each list, then the second value, and so on.
@@ -31,10 +30,16 @@ class ArrayNode(var nodes: List<Node> = listOf()) : Node {
             // If the lists are the same length and no comparison makes a decision about the order,
             //          continue checking the next part of the input.
             is ArrayNode -> {
-                nodes.forEach { }
-                TODO()
+                val left = this.nodes.iterator()
+                val right = other.nodes.iterator()
+                while (left.hasNext() && right.hasNext()) {
+                    val comparison = left.next() compareTo right.next()
+                    if (comparison != 0) return comparison
+                }
+                return left.hasNext() compareTo right.hasNext()
             }
         }
+    }
 
     operator fun plus(node: Node) {
         nodes += node
@@ -47,6 +52,7 @@ class ArrayNode(var nodes: List<Node> = listOf()) : Node {
 }
 
 
+@Suppress("DuplicatedCode")
 object Day13new : Puzzle(2022, 13) {
 
 
@@ -61,7 +67,7 @@ object Day13new : Puzzle(2022, 13) {
         checkIsCorrectOrder("[7,7,7,7]", "[7,7,7]", false)
         checkIsCorrectOrder("[]", "[3]", true)
 
-        checkIsCorrectOrder("[[[]]]", "[[]]]", false)
+        checkIsCorrectOrder("[[[]]]", "[[]]", false)
         checkIsCorrectOrder("[1,[2,[3,[4,[5,6,7]]]],8,9]", "[1,[2,[3,[4,[5,6,0]]]],8,9]", false)
 
     }
@@ -74,13 +80,17 @@ object Day13new : Puzzle(2022, 13) {
 
     override fun part1(input: List<String>): Any {
 
-
-        return 0
+        val nodes = input.parseNodes()
+        return nodes
+            .associate { nodes.indexOf(it) to it.isCorrectOrder() }
+            .entries
+            .filter { it.value }
+            .sumOf { it.key }
     }
 
     private fun Pair<Node, Node>.isCorrectOrder(): Boolean {
-        this.andLog()
-        return true
+
+        return first <= second
     }
 
     private fun String.parse(): Node {
@@ -88,15 +98,15 @@ object Day13new : Puzzle(2022, 13) {
         val stack = mutableListOf(array)
         var skip = 0
         for (idx in this.indices) {
-            if (skip > 0){
+            if (skip > 0) {
                 skip--
                 continue
             }
-            when (val it = this[idx]) {
+            when (this[idx]) {
                 '[' -> {
                     val newArray = ArrayNode()
                     array + newArray
-                    stack[0] = newArray
+                    stack.add(0, newArray)
                 }
 
                 ']' -> stack.removeFirst()
@@ -104,10 +114,10 @@ object Day13new : Puzzle(2022, 13) {
                 else -> {
                     val ints = mutableListOf<Char>()
                     var searchIdx = idx
-                    do{
+                    do {
                         ints.add(this[searchIdx++])
                         skip++
-                    } while (!listOf(',','[',']').contains(this[searchIdx]))
+                    } while (!listOf(',', '[', ']').contains(this[searchIdx]))
 
                     stack[0] + IntNode(ints.joinToString("").toInt())
                 }
@@ -118,6 +128,17 @@ object Day13new : Puzzle(2022, 13) {
 
     override fun part2(input: List<String>): Any {
         TODO("Not yet implemented")
+    }
+
+    private fun List<String>.parseNodes(): List<Pair<Node, Node>> {
+
+        return joinToString("\n")
+            .split("\n\n")
+            .map {
+                val parts = it.split("\n")
+                parts[0].parse() to parts[1].parse()
+            }
+
     }
 }
 
