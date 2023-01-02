@@ -9,12 +9,6 @@ data class Sensor(val position: Point, val beacon: Point) {
     constructor(ints: List<Int>) :
             this(ints[0] by ints[1], ints[2] by ints[3])
 
-    fun getSphereTouchingBeacon(inRow: Int): Set<Point> {
-        val i = taxicabDistance - abs(inRow - position.y)
-        return (position.x - i..position.x + i).map { x -> x by inRow }.toSet()
-
-    }
-
     fun getSphereTouchingBeacon(): Set<Point> {
         return (position.y - taxicabDistance..position.y + taxicabDistance)
             .flatMap { y ->
@@ -25,10 +19,12 @@ data class Sensor(val position: Point, val beacon: Point) {
             }.toSet()
     }
 
-    fun getInterval(inRow: Int, plusRadius: Int = 0): Pair<Int, Int> {
+    fun getInterval(inRow: Int, plusRadius: Int = 0): IntRange? {
         val radius = plusRadius + taxicabDistance
-        val i = abs(radius - abs(inRow - position.y))
-        return position.x - i to position.x + i
+        val i = radius - abs(inRow - position.y)
+        return if (i > 0)
+            position.x - i..position.x + i
+        else null
 
     }
 
@@ -93,50 +89,51 @@ object Day15 : Puzzle(2022, 15) {
     override fun part2(input: List<String>): Any {
         fun Point.tuningFrequency(): Int = x * 4_000_000 + y
         val sensors = parseSensors(input)
-        val limit = if (input.size < 20) 20 else 4_000_000
+        val limits = 0..if (input.size < 20) 20 else 4_000_000
 
-        val candidates = mutableSetOf<Point>()
-        for (y in 0..limit) {
-            sensors.mapToSet { it.getInterval(plusRadius = 1, inRow = y) }
-                .sortedBy { it.first }
-                .fold(0 to 0) { interval, next ->
-                    // case analysis:
-                    // if interval ends before next starts, return interval
-                    if (interval.second < next.first) interval
-                    // else if interval starts before next starts:
-                    else if (interval.second > next.second) interval
-                    //     if interval ends after next ends, return interval
-                    //     else return interval.start .. next.end
-                    else 0 to next.second
-
-
+        for (y in limits) {
+            sensors.mapToSet {
+                it.getInterval(y, 1)
+//                    .andLog("$y ${it.position} - ")
+            }.filterNotNull()
+                .fold(mutableListOf<IntRange>()) { intervals, interval ->
+                    intervals.mergeIn(interval, limits).andLog()
                 }.let {
-                    if (it.second < limit)
-                        candidates.add(it.second by y)
+                    if (it.size >= 2) {
+                        val x = it.first().last + 1
+                        return (x by y).tuningFrequency()
+                    }
                 }
 
+            println()
+        }
 
-        }
-        if (candidates.size > 1) {
-            error("${candidates.size} found!")
-        } else if (candidates.size == 1) {
-            return candidates.toList()[0].tuningFrequency()
-        }
-        error("No point found!")
+        error("none found")
     }
 
 
-    private inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> =
-        mapTo(LinkedHashSet(), transform)
 
-    private inline fun <T, R> Iterable<T>.flatMapToSet(transform: (T) -> Iterable<R>): Set<R> =
-        flatMapTo(LinkedHashSet(), transform)
+}
 
+private infix fun IntRange.intersects(other: IntRange): Boolean {
+    return !(this.first < other.last || this.last < other.first)
+}
 
-    private inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> {
-        return filterTo(LinkedHashSet(), predicate)
-    }
+private infix fun IntRange.union(
+    other: IntRange
+) = minOf(first, other.first)..maxOf(last, other.last)
 
+private fun MutableList<IntRange>.mergeIn(
+    interval: IntRange,
+    limits: IntRange
+): MutableList<IntRange> {
+    val element = find { it intersects interval }?.union(interval) ?: interval
+    add(element restrictedTo limits)
+    return this
+}
+
+private infix fun IntRange.restrictedTo(limit: IntRange): IntRange {
+    return limit.first.coerceAtLeast(first)..limit.last.coerceAtMost(last)
 }
 
 fun draw(points: Set<Point>, sensors: Set<Sensor>) {

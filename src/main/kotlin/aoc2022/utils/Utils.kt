@@ -3,7 +3,6 @@ package aoc2022.utils
 import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
-import kotlin.math.absoluteValue
 
 fun readInput() = readFile("input.txt")
 fun readTestInput() = readFile("test_input.txt")
@@ -43,8 +42,25 @@ infix fun <T> T.shouldNotBe(equalTo: T): T {
     return this
 }
 
+
+/// Iterable extension functions
+fun <T, R : Comparable<R>> Iterable<T>.extremaOf(selector: (T) -> R): Pair<R, R> =
+    minOf(selector) to maxOf(selector)
+
+inline fun <T, R> Iterable<T>.mapToSet(transform: (T) -> R): Set<R> =
+    mapTo(LinkedHashSet(), transform)
+
+inline fun <T, R> Iterable<T>.flatMapToSet(transform: (T) -> Iterable<R>): Set<R> =
+    flatMapTo(LinkedHashSet(), transform)
+
+
+inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> {
+    return filterTo(LinkedHashSet(), predicate)
+}
+
 typealias Point2D<E> = Pair<E, E>
 
+/// Points
 
 data class Point(val x: Int, val y: Int) {
     override fun toString(): String {
@@ -64,9 +80,6 @@ fun List<Int>.toPoint(): Point {
 fun Pair<Int, Int>.toPoint(): Point {
     return Point(first, second)
 }
-
-fun <T, R : Comparable<R>> Iterable<T>.extremaOf(selector: (T) -> R): Pair<R, R> =
-    minOf(selector) to maxOf(selector)
 
 fun draw(points: Set<Point>) {
     val sb = StringBuilder()
