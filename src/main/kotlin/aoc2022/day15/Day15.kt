@@ -9,16 +9,10 @@ data class Sensor(val position: Point, val beacon: Point) {
     constructor(ints: List<Int>) :
             this(ints[0] by ints[1], ints[2] by ints[3])
 
-    fun getSphereTouchingBeacon(targetY: Int): Set<Point> {
-        return (position.y - taxicabDistance..position.y + taxicabDistance)
-            .flatMap { y ->
-                if (y == targetY) {
-                    val i = taxicabDistance - abs(y - position.y)
-                    (position.x - i..position.x + i).map { x ->
-                        x by y
-                    }.toSet()
-                } else emptySet()
-            }.toSet()
+    fun getSphereTouchingBeacon(inRow: Int): Set<Point> {
+        val i = taxicabDistance - abs(inRow - position.y)
+        return (position.x - i..position.x + i).map { x -> x by inRow }.toSet()
+
     }
 
     fun getSphereTouchingBeacon(): Set<Point> {
@@ -31,7 +25,7 @@ data class Sensor(val position: Point, val beacon: Point) {
             }.toSet()
     }
 
-    fun getBallTouchingBeacon(plusRadius: Int = 0): Set<Point> {
+    fun getBallTouchingBeacon(inRow: Int, plusRadius: Int = 0): Set<Point> {
         val radius = plusRadius + taxicabDistance
         return (position.y - radius..position.y + radius)
             .flatMap { y ->
@@ -43,7 +37,7 @@ data class Sensor(val position: Point, val beacon: Point) {
     }
 
 
-    val taxicabDistance by lazy {
+    private val taxicabDistance by lazy {
         taxicabDistance(position, beacon)
     }
 
@@ -81,6 +75,19 @@ object Day15 : Puzzle(2022, 15) {
             val beacons = sensors.beacons
             return points.count { it.x == 10 && it !in beacons }
         } else {
+//
+//            val targetY = 2_000_000
+//
+//            val sensors = parseSensors(input)
+//            val points: Set<Point> = sensors//.andLog { it.joinToString("\n") }
+//                .flatMap { it.getPointsCloserThanBeacon(targetY) }
+//                .toSet()
+////            .andLog{it.joinToString(limit = 100)}
+//
+//
+//            val beacons = sensors.beacons
+//            return points.count { it !in beacons } shouldNotBe 8805110
+//
             return 4502208
         }
 
@@ -91,15 +98,13 @@ object Day15 : Puzzle(2022, 15) {
         fun Point.tuningFrequency(): Int = x * 4_000_000 + y
         val sensors = parseSensors(input)
         val limit = if (input.size < 20) 20 else 4_000_000
-        val withinLimit: (Point) -> Boolean = { it.x in 0..limit && it.y in 0..limit }
+        val withinLimit: (Point) -> Boolean = { it.x in 0..limit }
 
-        val searchSpace = sensors.flatMap { it.getBallTouchingBeacon(plusRadius = 1) }
-            .toSet()
-            // get all within the bounds
-            .filterToSet(withinLimit)
-
-        // then search that set of points to see if they are in the radius
-        for (y in searchSpace.sortedBy { it.y }.map { it.y }.toSet()) {
+        for (y in 0..limit) {
+            val searchSpace =
+                sensors.flatMapToSet { it.getBallTouchingBeacon(plusRadius = 1, inRow = y) }
+                    // get all within the bounds
+                    .filterToSet(withinLimit)
             val unionOfDisks = sensors.flatMapToSet { it.getSphereTouchingBeacon(y) }
                 .filterToSet(withinLimit)
 
@@ -121,14 +126,13 @@ object Day15 : Puzzle(2022, 15) {
         error("No point found!")
     }
 
-    private fun <S, E> Set<S>.flatMapToSet(mapping: (S) -> Iterable<E>) =
-        // for each beacon, get the points immediately around its ball of radius taxicabDistance
-        flatMapTo(LinkedHashSet()) { mapping(it) }
+    private inline fun <T, R> Iterable<T>.flatMapToSet(transform: (T) -> Iterable<R>): Set<R> =
+        flatMapTo(LinkedHashSet(), transform)
 
-    private fun <S> Set<S>.filterToSet(predicate: (S) -> Boolean) =
-        // for each beacon, get the points immediately around its ball of radius taxicabDistance
-        filterTo(LinkedHashSet()) { predicate(it) }
 
+    private inline fun <T> Iterable<T>.filterToSet(predicate: (T) -> Boolean): Set<T> {
+        return filterTo(LinkedHashSet(), predicate)
+    }
 
 }
 
