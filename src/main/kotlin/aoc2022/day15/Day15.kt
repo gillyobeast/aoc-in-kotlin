@@ -9,7 +9,7 @@ data class Sensor(val position: Point, val beacon: Point) {
     constructor(ints: List<Int>) :
             this(ints[0] by ints[1], ints[2] by ints[3])
 
-    fun getBallTouchingBeacon(targetY: Int): Set<Point> {
+    fun getSphereTouchingBeacon(targetY: Int): Set<Point> {
         return (position.y - taxicabDistance..position.y + taxicabDistance)
             .flatMap { y ->
                 if (y == targetY) {
@@ -21,7 +21,7 @@ data class Sensor(val position: Point, val beacon: Point) {
             }.toSet()
     }
 
-    fun getBallTouchingBeacon(): Set<Point> {
+    fun getSphereTouchingBeacon(): Set<Point> {
         return (position.y - taxicabDistance..position.y + taxicabDistance)
             .flatMap { y ->
                 val i = taxicabDistance - abs(y - position.y)
@@ -31,7 +31,7 @@ data class Sensor(val position: Point, val beacon: Point) {
             }.toSet()
     }
 
-    fun getDiscTouchingBeacon(plusRadius: Int = 0): Set<Point> {
+    fun getBallTouchingBeacon(plusRadius: Int = 0): Set<Point> {
         val radius = plusRadius + taxicabDistance
         return (position.y - radius..position.y + radius)
             .flatMap { y ->
@@ -73,7 +73,7 @@ object Day15 : Puzzle(2022, 15) {
         if (input.size < 20) {
             val sensors = parseSensors(input)
             val points: Set<Point> = sensors
-                .flatMap { it.getBallTouchingBeacon() }
+                .flatMap { it.getSphereTouchingBeacon() }
                 .toSet()
 
             draw(points, sensors)
@@ -93,14 +93,14 @@ object Day15 : Puzzle(2022, 15) {
         val limit = if (input.size < 20) 20 else 4_000_000
         val withinLimit: (Point) -> Boolean = { it.x in 0..limit && it.y in 0..limit }
 
-        val searchSpace = sensors.flatMap { it.getDiscTouchingBeacon(plusRadius = 1) }
+        val searchSpace = sensors.flatMap { it.getBallTouchingBeacon(plusRadius = 1) }
             .toSet()
             // get all within the bounds
             .filterToSet(withinLimit)
 
         // then search that set of points to see if they are in the radius
         for (y in searchSpace.sortedBy { it.y }.map { it.y }.toSet()) {
-            val unionOfDisks = sensors.flatMapToSet { it.getBallTouchingBeacon(y) }
+            val unionOfDisks = sensors.flatMapToSet { it.getSphereTouchingBeacon(y) }
                 .filterToSet(withinLimit)
 
             val candidates = searchSpace
