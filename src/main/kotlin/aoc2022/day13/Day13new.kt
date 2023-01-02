@@ -3,11 +3,11 @@ package aoc2022.day13
 import aoc2022.Puzzle
 
 sealed interface Node : Comparable<Node> {
-    fun close()
+//    fun close()
 }
 
 data class IntNode(val value: Int) : Node {
-    override fun close() {} // noop
+//    override fun close() {} // noop
 
     override fun compareTo(other: Node): Int =
         when (other) {
@@ -25,11 +25,11 @@ data class IntNode(val value: Int) : Node {
 
 data class ArrayNode(val nodes: MutableList<Node> = mutableListOf()) : Node {
 
-    var closed: Boolean = false
-
-    override fun close() {
-        closed = true
-    }
+//    var closed: Boolean = false
+//
+//    override fun close() {
+//        closed = true
+//    }
 
     constructor(node: Node) : this(mutableListOf(node))
 
@@ -58,6 +58,10 @@ data class ArrayNode(val nodes: MutableList<Node> = mutableListOf()) : Node {
         return nodes.joinToString(",", prefix = "[", postfix = "]")
     }
 
+    operator fun plusAssign(arrayNode: ArrayNode) {
+        nodes += arrayNode
+    }
+
 }
 
 
@@ -77,7 +81,7 @@ object Day13new : Puzzle(2022, 13) {
             expectEquals("[[[]]]".parse(), ArrayNode(ArrayNode(ArrayNode())))
         }
         run {
-            expectEquals("[100]".parse(), ArrayNode(100.i))
+            expectEquals("[-100]".parse(), ArrayNode((-100).i))
         }
 
         checkIsCorrectOrder("[1,1,3,1,1]", "[1,1,5,1,1]", true)
@@ -113,7 +117,7 @@ object Day13new : Puzzle(2022, 13) {
             .associate { nodes.indexOf(it) to it.isCorrectOrder() }
             .entries
             .filter { it.value }
-            .sumOf { it.key }
+            .sumOf { it.key + 1 }
     }
 
     private fun Pair<Node, Node>.isCorrectOrder(): Boolean {
@@ -122,47 +126,28 @@ object Day13new : Puzzle(2022, 13) {
     }
 
     private fun String.parse(): Node {
-        val array = ArrayNode()
-        val stack = mutableListOf(array)
-        var skip = 1
-        for (idx in this.indices) {
-            if (skip > 0) {
-                skip--
-                continue
-            }
-            when (this[idx]) {
-                '[' -> {
-                    val last = array.nodes.last()
-                    val newArray = ArrayNode()
-                    if (last is ArrayNode && last.closed) {
-                        last.nodes.add(newArray)
-                        stack.add(0, newArray)
-                    } else {
-                        array.nodes.add(newArray)
-                        stack.add(0, newArray)
+        val parser =
+            DeepRecursiveFunction<IndexedValue<String>, IndexedValue<Node>> { (startIndex, string) ->
+                if (string[startIndex] == '[') {
+                    var index = startIndex + 1
+                    val list = mutableListOf<Node>()
+                    while (string[index] != ']') {
+                        val (endIndex, entry) = callRecursive(string withIndex index)
+                        list.add(entry)
+                        index = if (string[endIndex] == ',') endIndex + 1 else endIndex
                     }
+                    ArrayNode(list) withIndex index + 1
+                } else {
+                    var index = startIndex + 1
+                    while (index < string.length && string[index] in '0'..'9') index++
+                    IntNode(string.substring(startIndex, index).toInt()) withIndex index
                 }
 
-                ']' -> {
-                    array.nodes.last().close()
-                    stack.removeFirst()
-                }
-
-                ',' -> skip++
-                else -> {
-                    val ints = mutableListOf<Char>()
-                    var searchIdx = idx
-                    do {
-                        ints.add(this[searchIdx++])
-                        skip++
-                    } while (!listOf(',', '[', ']').contains(this[searchIdx]))
-
-                    stack[0].nodes += IntNode(ints.joinToString("").toInt())
-                }
             }
-        }
-        return array
+        return parser.invoke(this withIndex 0).component2()
     }
+
+    private infix fun <T> T.withIndex(i: Int) = IndexedValue(i, this)
 
     override fun part2(input: List<String>): Any {
         TODO("Not yet implemented")
