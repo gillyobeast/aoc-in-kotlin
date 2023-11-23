@@ -1,8 +1,6 @@
-package aoc2022.dayXX
+package aoc2022
 
-import aoc2022.Puzzle
-
-object DayXX : Puzzle(2022, 0) {
+object Day${day} : Puzzle(2022, ${day}) {
     override fun part1(input: List<String>): Any {
         TODO("Not yet implemented")
     }
@@ -13,6 +11,6 @@ object DayXX : Puzzle(2022, 0) {
 
 }
 
-fun main() = DayXX.solve(-1, -1)
+fun main() = Day${day}.solve(${answer1}, -1)
 
 
