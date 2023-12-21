@@ -10,7 +10,7 @@ object Day01 : Puzzle(2023, 1) {
     //  What is the sum of all of the calibration values?
 
     override fun part1(input: List<String>): Any {
-        return input.map { it.extractDigits() }.map {
+        return input.map { it.extractDigits() }.filter { it.isNotEmpty() }.map {
             it.first() + it.last() // string concat
         }.sumOf { it.toInt() }
 
@@ -26,5 +26,5 @@ object Day01 : Puzzle(2023, 1) {
 }
 
 fun main() {
-    Day01.solve(142, -1)
+    Day01.solve(209, -1)
 }
