@@ -1,6 +1,6 @@
 package aoc2022.day18
 
-import aoc2022.Puzzle
+import Puzzle
 
 object Day18 : Puzzle(2022, 0) {
     override fun part1(input: List<String>): Any {

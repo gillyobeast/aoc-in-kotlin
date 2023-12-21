@@ -1,6 +1,6 @@
 package aoc2022.day02
 
-import aoc2022.Puzzle
+import Puzzle
 
 object Day02 : Puzzle(2022, 2) {
     enum class Shape(val score: Int) {

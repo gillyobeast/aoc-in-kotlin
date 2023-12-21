@@ -1,6 +1,6 @@
 package aoc2022.day12
 
-import aoc2022.Puzzle
+import Puzzle
 import aoc2022.utils.*
 import org.jgrapht.Graph
 import org.jgrapht.alg.shortestpath.AStarShortestPath

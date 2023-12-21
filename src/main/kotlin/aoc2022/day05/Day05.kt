@@ -1,6 +1,6 @@
 package aoc2022.day05
 
-import aoc2022.Puzzle
+import Puzzle
 import java.util.*
 
 object Day05 : Puzzle(2022, 5) {

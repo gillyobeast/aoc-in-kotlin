@@ -1,6 +1,6 @@
 package aoc2022.day13
 
-import aoc2022.Puzzle
+import Puzzle
 
 sealed interface Node : Comparable<Node> {
 //    fun close()

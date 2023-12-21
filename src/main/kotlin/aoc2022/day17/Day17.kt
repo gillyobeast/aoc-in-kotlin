@@ -1,6 +1,6 @@
 package aoc2022.day17
 
-import aoc2022.Puzzle
+import Puzzle
 
 object Day17 : Puzzle(2022, 0) {
     private val rocks = listOf("####", ".#.\n###\n.#.", "..#\n..#\n###", "#\n#\n#\n#", "##\n##")

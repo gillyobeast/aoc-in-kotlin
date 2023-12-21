@@ -1,6 +1,6 @@
 package aoc2022.day13
 
-import aoc2022.Puzzle
+import Puzzle
 import aoc2022.utils.andLog
 import aoc2022.utils.shouldNotBe
 import aoc2022.utils.toPoint

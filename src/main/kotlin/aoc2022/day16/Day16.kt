@@ -1,11 +1,10 @@
 package aoc2022.day16
 
-import aoc2022.Puzzle
+import Puzzle
 import aoc2022.utils.andLog
 import org.jgrapht.graph.DefaultDirectedGraph
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.builder.GraphBuilder
-import kotlin.coroutines.coroutineContext
 
 object Day16 : Puzzle(2022, 0) {
     private data class Valve(val label: String, val flowRate: Long, val leadsTo: Set<String>)

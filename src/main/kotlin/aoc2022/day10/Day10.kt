@@ -1,6 +1,6 @@
 package aoc2022.day10
 
-import aoc2022.Puzzle
+import Puzzle
 import aoc2022.utils.readInput
 import aoc2022.utils.readTestInput
 

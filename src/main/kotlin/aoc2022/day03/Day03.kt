@@ -1,6 +1,6 @@
 package aoc2022.day03
 
-import aoc2022.Puzzle
+import Puzzle
 
 object Day03 : Puzzle(2022, 3) {
     private fun <E> List<E>.toTriple(): Triple<E, E, E> {

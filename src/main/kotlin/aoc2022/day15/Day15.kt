@@ -1,6 +1,6 @@
 package aoc2022.day15
 
-import aoc2022.Puzzle
+import Puzzle
 import aoc2022.utils.*
 import kotlin.math.abs
 

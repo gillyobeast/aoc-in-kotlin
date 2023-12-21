@@ -1,6 +1,6 @@
 package aoc2022.day04
 
-import aoc2022.Puzzle
+import Puzzle
 
 object Day04 : Puzzle(2022, 4) {
 

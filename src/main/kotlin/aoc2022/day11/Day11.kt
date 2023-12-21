@@ -1,6 +1,6 @@
 package aoc2022.day11
 
-import aoc2022.Puzzle
+import Puzzle
 
 object Day11 : Puzzle(2022, 11) {
     data class Monkey(

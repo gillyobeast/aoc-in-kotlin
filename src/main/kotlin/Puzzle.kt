@@ -1,5 +1,3 @@
-package aoc2022
-
 import aoc2022.utils.appliedTo
 import aoc2022.utils.readInput
 import aoc2022.utils.readTestInput
