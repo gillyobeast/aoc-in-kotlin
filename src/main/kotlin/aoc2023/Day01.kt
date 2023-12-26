@@ -10,9 +10,7 @@ object Day01 : Puzzle(2023, 1) {
     //  What is the sum of all of the calibration values?
 
     override fun part1(input: List<String>): Any {
-        return input.map { it.extractDigits() }.filter { it.isNotEmpty() }.map {
-            it.first() + it.last() // string concat
-        }.sumOf { it.toInt() }
+        return getCalibrationValues(input) { it.extractDigits() }.sum()
 
     }
 
@@ -20,11 +18,15 @@ object Day01 : Puzzle(2023, 1) {
         filter { char -> char.isDigit() }.map { char -> char.toString() }
 
     override fun part2(input: List<String>): Any {
-        return input.map { it: String -> it.extractNumbers() }.filter { it.isNotEmpty() }.map {
-            it.first() + it.last() // string concat
-        }.sumOf { it.toInt() }
-        
+        return getCalibrationValues(input) { it.extractNumbers() }.sum()
+
     }
+
+    private fun getCalibrationValues(input: List<String>, extractor: (String) -> List<String>) =
+        input.map(extractor)
+            .filter { it.isNotEmpty() }
+            .map { it.first() + it.last() }
+            .map(String::toInt)
 
     private val numbers = mapOf(
         "one" to 1, "two" to 2, "three" to 3, "four" to 4, "five" to 5,
