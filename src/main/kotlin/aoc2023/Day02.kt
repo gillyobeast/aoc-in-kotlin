@@ -10,14 +10,38 @@ object Day02 : Puzzle(2023, 1) {
 //    Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 //    Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 
+    val totalCubes = mapOf("red" to 12, "green" to 13, "blue" to 14)
+
+    data class Game(val hands: List<Hand>) {
+        data class Hand(val cubes: Map<String, Int>)
+
+        val isPossible: Boolean =
+            !hands.any { hand ->
+                hand.cubes.entries.any {
+                    it.value > totalCubes[it.key]!!
+                }
+            }
+
+    }
+
     override fun part1(input: List<String>): Any {
-        val  games = input.associate {
+        val games = input.associate {
             it.extractGameId() to it.substringAfter(": ")
-        }.onEach { println(it) }
+        }.mapValues { it.toGame() }.onEach { println(it) }
 
+        return games.mapValues { it.value.isPossible }.filter { it.value }.keys.sum()
 
+    }
 
-        TODO()
+    private fun Map.Entry<Int, String>.toGame(): Game {
+        return Game(this.value.split("; ?".toRegex()).map { it.toHand() })
+    }
+
+    private fun String.toHand(): Game.Hand {
+        //            6 red, 1 blue, 3 green
+        val map = this.split(", ")
+            .map { it.split(" ") }.associate { it[1] to it[0].toInt() }
+        return Game.Hand(map)
     }
 
     override fun part2(input: List<String>): Any {
@@ -32,5 +56,5 @@ private fun String.extractGameId(): Int {
 }
 
 fun main() {
-    Day02.solve(209, 281)
+    Day02.solve(8, -1)
 }
