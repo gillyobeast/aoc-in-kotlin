@@ -1,6 +1,7 @@
 package aoc2023
 
 import Puzzle
+import kotlin.math.max
 
 object Day02 : Puzzle(2023, 1) {
 
@@ -15,22 +16,40 @@ object Day02 : Puzzle(2023, 1) {
     data class Game(val hands: List<Hand>) {
         data class Hand(val cubes: Map<String, Int>)
 
-        val isPossible: Boolean =
+        val isPossible =
             !hands.any { hand ->
                 hand.cubes.entries.any {
                     it.value > totalCubes[it.key]!!
                 }
             }
 
+        fun minCubesPower(): Long {
+            val map = buildMap {
+                hands.forEach { hand ->
+                    hand.cubes.forEach {
+                        this[it.key] = if (this.containsKey(it.key)) {
+                            max(it.value, this[it.key]!!)
+                        } else {
+                            it.value
+                        }
+                    }
+                }
+            }
+            return map.values.map { it.toLong() }.fold(1) { acc: Long, l: Long -> acc * l }
+        }
     }
 
+
     override fun part1(input: List<String>): Any {
-        val games = input.associate {
+
+        return getGames(input).mapValues { it.value.isPossible }.filter { it.value }.keys.sum()
+
+    }
+
+    private fun getGames(input: List<String>): Map<Int, Game> {
+        return input.associate {
             it.extractGameId() to it.substringAfter(": ")
         }.mapValues { it.toGame() }.onEach { println(it) }
-
-        return games.mapValues { it.value.isPossible }.filter { it.value }.keys.sum()
-
     }
 
     private fun Map.Entry<Int, String>.toGame(): Game {
@@ -45,7 +64,7 @@ object Day02 : Puzzle(2023, 1) {
     }
 
     override fun part2(input: List<String>): Any {
-        TODO("Not yet implemented")
+        return getGames(input).values.sumOf { it.minCubesPower() }
     }
 }
 
@@ -56,5 +75,5 @@ private fun String.extractGameId(): Int {
 }
 
 fun main() {
-    Day02.solve(8, -1)
+    Day02.solve(8, 2286L)
 }
